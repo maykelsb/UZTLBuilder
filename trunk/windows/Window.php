@@ -48,7 +48,7 @@ abstract class Window {
   /**
   * Referência para objeto glade da janela.
   */
-  protected $glade;
+  private $glade;
   /**
   * Referência direta para a janela desenhada no arquivo glade.
   */
@@ -83,6 +83,24 @@ abstract class Window {
     $filter->set_name($filtername);
     $filter->add_pattern($pattern);
     return $filter;
+  }
+
+  /**
+  * Exibe a caixa de diálogo about, se existir.
+  */ 
+  public function showAbout() {
+    $aboutdialog = new DlgAbout;
+    if (!is_null($aboutdialog)) {
+      $aboutdialog->run();
+      $aboutdialog->destroy();
+    }
+  }
+
+  /**
+  * Método de atalho.
+  */
+  protected function get_widget($wdgName) {
+    return $this->glade->get_widget($wdgName);
   }
 }
 ?>

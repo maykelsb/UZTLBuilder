@@ -45,20 +45,98 @@
 */
 class WinMain extends Window {
 
-  public function __construct() {
-    parent::__construct();
-    $filechooserdialog = $this->glade->get_widget('filechooserbuttonLoadTileset');
-    $filechooserdialog->add_filter($this->createFileFilter('PNG Tilesets', '*.png'));
-  }
+  private $prjName = 'prj1';
 
   /**
-  * Exibe a caixa de diálogo about, se existir.
-  */ 
-  public function showAbout() {
-    $aboutdialog = new DlgAbout;
-    if (!is_null($aboutdialog)) {
-      $aboutdialog->run();
-      $aboutdialog->destroy();
+  * Constróia a janela principal da aplicação.
+  *
+  * Adicionalmente, define um filtro para a janela de seleção de arquivos e 
+  * define seu diretório inicial de trabalho.
+  * @see Window.createFileFilter()
+  */
+  public function __construct() {
+    parent::__construct();
+    $filechooserbutton = $this->get_widget('filechooserbuttonLoadTileset');
+    $filechooserbutton->add_filter($this->createFileFilter('PNG Tilesets', '*.png'));
+    $filechooserbutton->set_current_folder(ROOT . 'projects/');
+    $filechooserbutton->add_shortcut_folder(ROOT . 'projects/');
+  }
+
+  public function setBackgroundColor() {
+    $colorbuttonBackGColor = $this->get_widget('colorbuttonBackGColor');
+    foreach (array('viewportWorkArea', 'viewportSelection') as $wdgName) {
+      $$wdgName = $this->glade->get_widget($wdgName);
+      $$wdgName->modify_bg(Gtk::STATE_NORMAL, $colorbuttonBackGColor->get_color());
+    }
+  }
+
+  public function loadTileSet() {
+    $filechooserbutton = $this->get_widget('filechooserbuttonLoadTileset');
+    $orgFileURL = $filechooserbutton->get_filename();
+    $newFileURL = ROOT . 'projects/' . $this->prjName . '/tileset.png';
+    if (!is_file($orgFileURL)) {
+      trigger_error('Invalid file selected.', E_USER_ERROR);
+    }
+    // -- Copiando o tileset para o diretório de trabalho
+    if (!copy($orgFileURL, $newFileURL)) {
+      trigger_error('Failed to copy tileset to work directory.', E_USER_ERROR);
+    }
+    $this->breakTilesetInTiles();
+    $this->loadTilesetInSelectionArea();
+  }
+  
+  private function breakTilesetInTiles() {
+    if (is_dir(ROOT . "projects/{$this->prjName}/tiles")) {
+      Filesystem::delDir(ROOT . "projects/{$this->prjName}/tiles");
+    }
+    if (!mkdir(ROOT . "projects/{$this->prjName}/tiles/")) {
+      trigger_error('Failed to create diretory "tiles".', E_USER_ERROR);
+    }
+
+    // -- Quebrando o tileset em tiles
+    $wdgTileSize = $this->get_widget('spinbuttonWidthTile');
+    $tileWidth = $wdgTileSize->get_value_as_int();
+    $wdgTileSize = $this->get_widget('spinbuttonHeightTile');
+    $tileHeight = $wdgTileSize->get_value_as_int();
+    $wdgTileSize = null; unset($wdgTileSize);
+    // -- Características da imagem
+    $imgTileset = imagecreatefrompng(ROOT . 'projects/' . $this->prjName . '/tileset.png');
+    $imgTile = imagecreatetruecolor($tileWidth, $tileHeight);
+    imagesavealpha($imgTile, true);
+    $alpha = imagecolorallocatealpha($imgTile, 0, 0, 0, 127);
+    imagefill($imgTile, 0, 0, $alpha);
+    // -- Gerando tiles
+    for ($y = 0; $y < (imagesy($imgTileset) / $tileHeight); $y++) {
+      for ($x = 0; $x < (imagesx($imgTileset) / $tileWidth); $x++) {
+        $imgTile = imagecreatetruecolor($tileWidth, $tileHeight);
+        imagealphablending($imgTile, false);
+        imagesavealpha($imgTile, true);
+        imagefill($imgTile, 0, 0, $alpha);
+        imagecopy($imgTile, $imgTileset, 0, 0, $x * $tileWidth, $y * $tileHeight, $tileWidth, $tileHeight);
+        imagepng($imgTile, sprintf(ROOT . "projects/{$this->prjName}/tiles/%02d-%02d.png", $x, $y));
+      }
+    }
+  }
+
+  public function loadTilesetInSelectionArea() {
+    
+  }
+
+
+
+  /**
+  * Cria o diretório do projeto.
+  *
+  * @todo Criar o arquivo de definição do projeto!
+  * @todo Colocar na chamada do botão novo!
+  * @see ROOT
+  */
+  public function createProject() {
+    // -- Criando o diretório de trabalho se ele não existir
+    if (!is_dir(ROOT . 'projects/' . $this->prjName . '/')) {
+      if (!mkdir(ROOT . 'projects/' . $this->prjName . '/')) {
+        trigger_error('Failed to create work directory.', E_USER_ERROR);
+      }
     }
   }
 }

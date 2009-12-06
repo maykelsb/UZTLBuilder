@@ -55,7 +55,9 @@ function __autoload($class) {
     /**
     * Carregando definição de classes sobre demanda.
     */
-    require_once(ROOT . 'windows/' . $class . '.php');
+    require_once(ROOT . "windows/{$class}.php");
+  } else {
+    require_once(ROOT . "/{$class}.php");
   }
 }
 ?>
