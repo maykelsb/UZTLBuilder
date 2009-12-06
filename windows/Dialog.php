@@ -34,11 +34,15 @@
 * other provisions required by the New BSD License. If you do not delete
 * the provisions above, a recipient may use your version of this file
 * under either the MPL or the New BSD License.
+*
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 
 
 /**
+* Classe base para manipulação de dialogs criados com glade.
 *
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 abstract class Dialog {
   protected $glade;

@@ -34,12 +34,23 @@
 * other provisions required by the New BSD License. If you do not delete
 * the provisions above, a recipient may use your version of this file
 * under either the MPL or the New BSD License.
+*
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 
 /**
+* Classe de manipulação da janela principal da aplicação.
 *
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 class WinMain extends Window {
+
+  public function __construct() {
+    parent::__construct();
+    $filechooserdialog = $this->glade->get_widget('filechooserbuttonLoadTileset');
+    $filechooserdialog->add_filter($this->createFileFilter('PNG Tilesets', '*.png'));
+  }
+
   /**
   * Exibe a caixa de diálogo about, se existir.
   */ 
