@@ -34,10 +34,14 @@
 * other provisions required by the New BSD License. If you do not delete
 * the provisions above, a recipient may use your version of this file
 * under either the MPL or the New BSD License.
+*
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 
 /**
 * Classe base para manipulação de janelas criadas com glade.
+*
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 abstract class Window {
 
@@ -65,6 +69,20 @@ abstract class Window {
   */
   public function closeWindow() {
     Gtk::main_quit();
+  }
+
+  /**
+  * Cria e retorna um filtro de seleção de arquivos.
+  *
+  * @param $filtername string Nome do filtro para leitura humana;
+  * @param $pattern string Padrão de filtragem para seleção de arquivos;
+  * @return GtkFileFilter
+  */
+  protected function createFileFilter($filtername, $pattern) {
+    $filter = new GtkFileFilter();
+    $filter->set_name($filtername);
+    $filter->add_pattern($pattern);
+    return $filter;
   }
 }
 ?>

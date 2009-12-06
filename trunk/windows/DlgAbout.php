@@ -34,18 +34,25 @@
 * other provisions required by the New BSD License. If you do not delete
 * the provisions above, a recipient may use your version of this file
 * under either the MPL or the New BSD License.
+*
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 
 /**
+* Acrescenta informações e créditos não suportados pelo Glade.
 *
+* @see Dialog
 */
 class DlgAbout extends Dialog {
+  /**
+  * Informações adicionais.
+  */
   public function __construct() {
     parent::__construct();
     $this->set_license(file_get_contents(ROOT . 'MPL-1.1.txt'));
     $this->set_artists(array('Logo e Icones: Turbomilk <http://turbomilk.com/>'));
     $this->set_authors(array('Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>',
-                             'UpZone Games <http://blogupzone.blogspot.com'));
+                             'UpZone Games <http://blogupzone.blogspot.com>'));
   }
 }
 ?>
