@@ -45,7 +45,10 @@
 */
 class WinMain extends Window {
 
-  private $prjName = 'prj1';
+  const EXTENCAO_PROJETO = 'utbp';
+
+
+  private $prjName;
 
   /**
   * Constróia a janela principal da aplicação.
@@ -119,7 +122,7 @@ class WinMain extends Window {
   }
 
   public function loadTilesetInSelectionArea() {
-    
+    $wgtTilesetSelection = $this->get_widget('viewportTilesetSelection');
   }
 
 
@@ -132,12 +135,27 @@ class WinMain extends Window {
   * @see ROOT
   */
   public function createProject() {
-    // -- Criando o diretório de trabalho se ele não existir
-    if (!is_dir(ROOT . 'projects/' . $this->prjName . '/')) {
-      if (!mkdir(ROOT . 'projects/' . $this->prjName . '/')) {
-        trigger_error('Failed to create work directory.', E_USER_ERROR);
-      }
+    $dlg = new GtkFileChooserDialog(
+      'Criar novo projeto...',
+      null,
+      Gtk::FILE_CHOOSER_ACTION_SAVE,
+      array(
+        Gtk::STOCK_OK, Gtk::RESPONSE_OK,
+        Gtk::STOCK_CANCEL, Gtk::RESPONSE_CANCEL));
+    // -- Caminho padrão de projetos
+    $dlg->set_current_folder(ROOT . 'projects/');
+    $dlg->add_filter($this->createFileFilter('Projeto UZTLBuilder', '*.'. EXTENCAO_PROJETO));
+    if (Gtk::RESPONSE_OK == $dlg->run()) {
+      $path = Filesystem::normalizarPath($dlg->get_filename());
+      if (!mkdir($path)) { trigger_error('Não foi possível criar o diretório do projeto.', E_USER_ERROR); }
+      $xml = new DomDocument('1.0', 'iso-8859-1');
+      $elmRoot = $xml->appendChild(new DomElement('projeto'));
+      $elmRoot->setAttributeNode(new DOMAttr('path', Filesystem::normalizarPath($dlg->get_filename())));
+      $elmRoot->setAttributeNode(new DOMAttr('criacao', date('Ymd')));
+      $this->prjName = $path . '.' . WinMain::EXTENCAO_PROJETO; 
+      file_put_contents($this->prjName, $xml->saveXML());
     }
+    $dlg->destroy();
   }
 }
 ?>
