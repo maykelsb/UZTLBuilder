@@ -125,8 +125,6 @@ class WinMain extends Window {
     $wgtTilesetSelection = $this->get_widget('viewportTilesetSelection');
   }
 
-
-
   /**
   * Cria o diretório do projeto.
   *

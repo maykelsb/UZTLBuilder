@@ -1,1 +1,0 @@
-This directory is where the projects are saved.
