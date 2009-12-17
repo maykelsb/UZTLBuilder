@@ -53,11 +53,14 @@ function __autoload($class) {
    || (false !== strpos($class, 'Dlg'))
    || (false !== strpos($class, 'Dia'))) {
     /**
-    * Carregando definição de classes sobre demanda.
+    * Carregando definição de classes de janela sobre demanda.
     */
     require_once(ROOT . "windows/{$class}.php");
   } else {
-    require_once(ROOT . "/{$class}.php");
+    /**
+    * Carregando classes utilitárias.
+    */
+    require_once(ROOT . "util/{$class}.php");
   }
 }
 ?>
