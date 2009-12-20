@@ -16,7 +16,7 @@
     <property name="website">http://blogupzone.blogspot.com</property>
     <property name="website_label" translatable="yes">UpZone Games</property>
     <property name="license" translatable="yes">a</property>
-    <property name="logo">../imagens/logo.png</property>
+    <property name="logo">imagens/logo.png</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>

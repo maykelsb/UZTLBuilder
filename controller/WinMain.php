@@ -39,21 +39,13 @@
 */
 
 /**
-* Classe de manipulação da janela principal da aplicação.
+* Classe de controle da janela principal (WinMain).
 *
 * @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 class WinMain extends Window {
 
   private $projeto;
-
-
-
-
-
-
-
-  private $prjName;
 
   /**
   * Constróia a janela principal da aplicação.
@@ -66,76 +58,17 @@ class WinMain extends Window {
     parent::__construct();
     $filechooserbutton = $this->get_widget('filechooserbuttonLoadTileset');
     $filechooserbutton->add_filter($this->createFileFilter('PNG Tilesets', '*.png'));
-    $filechooserbutton->set_current_folder(ROOT . 'projects/');
-    $filechooserbutton->add_shortcut_folder(ROOT . 'projects/');
-  }
-
-  public function setBackgroundColor() {
-    $colorbuttonBackGColor = $this->get_widget('colorbuttonBackGColor');
-    foreach (array('viewportWorkArea', 'viewportSelection') as $wdgName) {
-      $$wdgName = $this->glade->get_widget($wdgName);
-      $$wdgName->modify_bg(Gtk::STATE_NORMAL, $colorbuttonBackGColor->get_color());
-    }
-  }
-
-  public function loadTileSet() {
-    $filechooserbutton = $this->get_widget('filechooserbuttonLoadTileset');
-    $orgFileURL = $filechooserbutton->get_filename();
-    $newFileURL = ROOT . 'projects/' . $this->prjName . '/tileset.png';
-    if (!is_file($orgFileURL)) {
-      trigger_error('Invalid file selected.', E_USER_ERROR);
-    }
-    // -- Copiando o tileset para o diretório de trabalho
-    if (!copy($orgFileURL, $newFileURL)) {
-      trigger_error('Failed to copy tileset to work directory.', E_USER_ERROR);
-    }
-    $this->breakTilesetInTiles();
-    $this->loadTilesetInSelectionArea();
-  }
-  
-  private function breakTilesetInTiles() {
-    if (is_dir(ROOT . "projects/{$this->prjName}/tiles")) {
-      Filesystem::delDir(ROOT . "projects/{$this->prjName}/tiles");
-    }
-    if (!mkdir(ROOT . "projects/{$this->prjName}/tiles/")) {
-      trigger_error('Failed to create diretory "tiles".', E_USER_ERROR);
-    }
-
-    // -- Quebrando o tileset em tiles
-    $wdgTileSize = $this->get_widget('spinbuttonWidthTile');
-    $tileWidth = $wdgTileSize->get_value_as_int();
-    $wdgTileSize = $this->get_widget('spinbuttonHeightTile');
-    $tileHeight = $wdgTileSize->get_value_as_int();
-    $wdgTileSize = null; unset($wdgTileSize);
-    // -- Características da imagem
-    $imgTileset = imagecreatefrompng(ROOT . 'projects/' . $this->prjName . '/tileset.png');
-    $imgTile = imagecreatetruecolor($tileWidth, $tileHeight);
-    imagesavealpha($imgTile, true);
-    $alpha = imagecolorallocatealpha($imgTile, 0, 0, 0, 127);
-    imagefill($imgTile, 0, 0, $alpha);
-    // -- Gerando tiles
-    for ($y = 0; $y < (imagesy($imgTileset) / $tileHeight); $y++) {
-      for ($x = 0; $x < (imagesx($imgTileset) / $tileWidth); $x++) {
-        $imgTile = imagecreatetruecolor($tileWidth, $tileHeight);
-        imagealphablending($imgTile, false);
-        imagesavealpha($imgTile, true);
-        imagefill($imgTile, 0, 0, $alpha);
-        imagecopy($imgTile, $imgTileset, 0, 0, $x * $tileWidth, $y * $tileHeight, $tileWidth, $tileHeight);
-        imagepng($imgTile, sprintf(ROOT . "projects/{$this->prjName}/tiles/%02d-%02d.png", $x, $y));
-      }
-    }
-  }
-
-  public function loadTilesetInSelectionArea() {
-    $wgtTilesetSelection = $this->get_widget('viewportTilesetSelection');
+    $filechooserbutton->set_current_folder(ROOT . 'projetos/');
+    $filechooserbutton->add_shortcut_folder(ROOT . 'projetos/');
   }
 
   /**
-  * Cria o diretório do projeto.
+  * Cria um novo projeto.
   *
-  * @todo Criar o arquivo de definição do projeto!
-  * @todo Colocar na chamada do botão novo!
-  * @see ROOT
+  * Um projeto é composto por um arquivo de definição e diretório de trabalho.
+  * É recomendado que seja criado dentro do diretório 'projetos' dentro da
+  * instalação da app.
+  * @see Projeto
   */
   public function createProject() {
     $dlg = new GtkFileChooserDialog('Criar novo projeto...',
@@ -153,6 +86,80 @@ class WinMain extends Window {
       $this->projeto = Projeto::criarProjeto(Filesystem::normalizarPath($dlg->get_filename()));
     }
     $dlg->destroy();
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  public function setBackgroundColor() {
+    $colorbuttonBackGColor = $this->get_widget('colorbuttonBackGColor');
+    foreach (array('viewportWorkArea', 'viewportSelection') as $wdgName) {
+      $$wdgName = $this->glade->get_widget($wdgName);
+      $$wdgName->modify_bg(Gtk::STATE_NORMAL, $colorbuttonBackGColor->get_color());
+    }
+  }
+
+  public function loadTileSet() {
+    $filechooserbutton = $this->get_widget('filechooserbuttonLoadTileset');
+    $orgFileURL = $filechooserbutton->get_filename();
+    $newFileURL = ROOT . 'projetos/' . $this->prjName . '/tileset.png';
+    if (!is_file($orgFileURL)) {
+      trigger_error('Invalid file selected.', E_USER_ERROR);
+    }
+    // -- Copiando o tileset para o diretório de trabalho
+    if (!copy($orgFileURL, $newFileURL)) {
+      trigger_error('Failed to copy tileset to work directory.', E_USER_ERROR);
+    }
+    $this->breakTilesetInTiles();
+    $this->loadTilesetInSelectionArea();
+  }
+  
+  private function breakTilesetInTiles() {
+    if (is_dir(ROOT . "projetos/{$this->prjName}/tiles")) {
+      Filesystem::delDir(ROOT . "projetos/{$this->prjName}/tiles");
+    }
+    if (!mkdir(ROOT . "projetos/{$this->prjName}/tiles/")) {
+      trigger_error('Failed to create diretory "tiles".', E_USER_ERROR);
+    }
+
+    // -- Quebrando o tileset em tiles
+    $wdgTileSize = $this->get_widget('spinbuttonWidthTile');
+    $tileWidth = $wdgTileSize->get_value_as_int();
+    $wdgTileSize = $this->get_widget('spinbuttonHeightTile');
+    $tileHeight = $wdgTileSize->get_value_as_int();
+    $wdgTileSize = null; unset($wdgTileSize);
+    // -- Características da imagem
+    $imgTileset = imagecreatefrompng(ROOT . 'projetos/' . $this->prjName . '/tileset.png');
+    $imgTile = imagecreatetruecolor($tileWidth, $tileHeight);
+    imagesavealpha($imgTile, true);
+    $alpha = imagecolorallocatealpha($imgTile, 0, 0, 0, 127);
+    imagefill($imgTile, 0, 0, $alpha);
+    // -- Gerando tiles
+    for ($y = 0; $y < (imagesy($imgTileset) / $tileHeight); $y++) {
+      for ($x = 0; $x < (imagesx($imgTileset) / $tileWidth); $x++) {
+        $imgTile = imagecreatetruecolor($tileWidth, $tileHeight);
+        imagealphablending($imgTile, false);
+        imagesavealpha($imgTile, true);
+        imagefill($imgTile, 0, 0, $alpha);
+        imagecopy($imgTile, $imgTileset, 0, 0, $x * $tileWidth, $y * $tileHeight, $tileWidth, $tileHeight);
+        imagepng($imgTile, sprintf(ROOT . "projetos/{$this->prjName}/tiles/%02d-%02d.png", $x, $y));
+      }
+    }
+  }
+
+  public function loadTilesetInSelectionArea() {
+    $wgtTilesetSelection = $this->get_widget('viewportTilesetSelection');
   }
 }
 ?>

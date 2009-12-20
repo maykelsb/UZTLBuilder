@@ -49,7 +49,7 @@ abstract class Dialog {
   protected $dialog;
   
   public function __construct() {
-    $this->glade = new GladeXML('windows/glade/' . get_class($this) . '.glade');
+    $this->glade = new GladeXML('view/' . get_class($this) . '.glade');
     $this->dialog = $this->glade->get_widget(get_class($this));
   }
 

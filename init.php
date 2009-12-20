@@ -49,16 +49,19 @@ define(ROOT, dirname(__FILE__) . '/');
 * Carga de classes sobre demanda.
 */
 function __autoload($class) {
-  if ((false !== strpos($class, 'Win'))
-   || (false !== strpos($class, 'Dlg'))
-   || (false !== strpos($class, 'Dia'))) {
+  if (is_file(ROOT . "controller/{$class}.php")) {
     /**
-    * Carregando definição de classes de janela sobre demanda.
+    * Carregando controladores;
     */
-    require_once(ROOT . "windows/{$class}.php");
+    require_once(ROOT . "controller/{$class}.php");
+  } else if (is_file(ROOT . "model/{$class}.php")) {
+    /**
+    * Carregando modelos de persistência;
+    */
+    require_once(ROOT . "model/{$class}.php");
   } else {
     /**
-    * Carregando classes utilitárias.
+    * Carregando utilitários;
     */
     require_once(ROOT . "util/{$class}.php");
   }

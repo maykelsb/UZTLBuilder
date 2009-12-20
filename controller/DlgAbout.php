@@ -49,7 +49,7 @@ class DlgAbout extends Dialog {
   */
   public function __construct() {
     parent::__construct();
-    $this->set_license(file_get_contents(ROOT . 'MPL-1.1.txt'));
+    $this->set_license(file_get_contents(ROOT . 'licenca.txt'));
     $this->set_artists(array('Logo e Icones: Turbomilk <http://turbomilk.com/>'));
     $this->set_authors(array('Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>',
                              'UpZone Games <http://blogupzone.blogspot.com>'));
