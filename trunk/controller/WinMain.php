@@ -42,8 +42,9 @@
 * Classe de controle da janela principal (WinMain).
 *
 * @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
+* @final
 */
-class WinMain extends Window {
+final class WinMain extends Window {
 
   private $projeto;
 
@@ -55,11 +56,28 @@ class WinMain extends Window {
   * @see Window.createFileFilter()
   */
   public function __construct() {
-    parent::__construct();
+    /*parent::__construct();
     $filechooserbutton = $this->get_widget('filechooserbuttonLoadTileset');
     $filechooserbutton->add_filter($this->createFileFilter('PNG Tilesets', '*.png'));
-    $filechooserbutton->set_current_folder(ROOT . 'projetos/');
-    $filechooserbutton->add_shortcut_folder(ROOT . 'projetos/');
+    $filechooserbutton->set_current_folder(DIR_PROJETOS);
+    $filechooserbutton->add_shortcut_folder(DIR_PROJETOS);*/
+  }
+
+  private function dlgArquivos($tituloCaixaSelecao, $tipoCaixaSelecao) {
+    $dlg = new GtkFileChooserDialog($tituloCaixaSelecao,
+      null,
+      $tipoCaixaSelecao,
+      array(Gtk::STOCK_OK, Gtk::RESPONSE_OK,
+        Gtk::STOCK_CANCEL, Gtk::RESPONSE_CANCEL));
+    // -- Caminho padrão de projetos e filtro para tipo de arquivo
+    $dlg->set_current_folder(DIR_PROJETOS);
+    $dlg->add_filter($this->createFileFilter(Projeto::DESC_TIPO_ARQUIVO_PROJETO,
+                                             '*.'. Projeto::EXTENCAO_ARQUIVO_PROJETO));
+    if (Gtk::RESPONSE_OK == $dlg->run()) {
+      return $dlg->get_filename();
+    }
+    $dlg->destroy();
+    return null;
   }
 
   /**
@@ -70,25 +88,23 @@ class WinMain extends Window {
   * instalação da app.
   * @see Projeto
   */
-  public function createProject() {
-    $dlg = new GtkFileChooserDialog('Criar novo projeto...',
-                                    null,
-                                    Gtk::FILE_CHOOSER_ACTION_SAVE,
-                                    array(
-                                      Gtk::STOCK_OK, Gtk::RESPONSE_OK,
-                                      Gtk::STOCK_CANCEL, Gtk::RESPONSE_CANCEL));
-    // -- Caminho padrão de projetos e filtro para tipo de arquivo
-    $dlg->set_current_folder(ROOT . 'projetos/');
-    $dlg->add_filter($this->createFileFilter(Projeto::DESC_TIPO_ARQUIVO_PROJETO,
-                                             '*.'. Projeto::EXTENCAO_ARQUIVO_PROJETO));
-    // -- Criando projeto
-    if (Gtk::RESPONSE_OK == $dlg->run()) {
-      $this->projeto = Projeto::criarProjeto(Filesystem::normalizarPath($dlg->get_filename()));
+  public function criarProjeto() {
+    $pathSelecionado = $this->dlgArquivos('Criar projeto',
+      Gtk::FILE_CHOOSER_ACTION_SAVE);
+    if (!is_null($pathSelecionado)) {
+      var_dump($pathSelecionado);
+      $this->projeto = Projeto::criarProjeto($pathSelecionado);
     }
-    $dlg->destroy();
   }
 
-
+  public function abrirProjeto() {
+    $pathSelecionado = $this->dlgArquivos('Abrir projeto',
+      Gtk::FILE_CHOOSER_ACTION_OPEN);
+    if (!is_null($pathSelecionado)) {
+      var_dump($pathSelecionado);
+      $this->projeto = Projeto::abrirProjeto($pathSelecionado);
+    }
+  }
 
 
 

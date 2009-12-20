@@ -41,29 +41,64 @@
 /**
 * Define o diretório raiz da aplicação.
 *
-* @name ROOT
+* @const ROOT
 */
-define(ROOT, dirname(__FILE__) . '/');
+define(ROOT, dirname(__FILE__) . DIRECTORY_SEPARATOR);
+/**
+* Diretório de projetos padrão da aplicação.
+*
+* @const DIR_PROJETOS
+* @see ROOT
+*/
+define(DIR_PROJETOS, ROOT . 'projetos' . DIRECTORY_SEPARATOR);
+/**
+* Diretório de controllers da aplicação.
+*
+* @const DIR_CONTROLLER
+* @see ROOT
+*/
+define(DIR_CONTROLLER, ROOT . 'controller' . DIRECTORY_SEPARATOR);
+/**
+* Diretório de models da aplicação.
+*
+* @const DIR_MODEL
+* @see ROOT
+*/
+define(DIR_MODEL, ROOT . 'model' . DIRECTORY_SEPARATOR);
+/**
+* Diretório de views da aplicação.
+*
+* @const DIR_VIEW
+* @see ROOT
+*/
+define(DIR_VIEW, ROOT . 'view' . DIRECTORY_SEPARATOR);
+/**
+* Diretório de funções/classes utilitárias da aplicação.
+*
+* @const DIR_UTIL
+* @see ROOT
+*/
+define(DIR_UTIL, ROOT . 'util' . DIRECTORY_SEPARATOR);
 
 /**
 * Carga de classes sobre demanda.
 */
 function __autoload($class) {
-  if (is_file(ROOT . "controller/{$class}.php")) {
+  if (is_file(DIR_CONTROLLER . "{$class}.php")) {
     /**
     * Carregando controladores;
     */
-    require_once(ROOT . "controller/{$class}.php");
-  } else if (is_file(ROOT . "model/{$class}.php")) {
+    require_once(DIR_MODEL . "{$class}.php");
+  } else if (is_file(DIR_MODEL . "{$class}.php")) {
     /**
     * Carregando modelos de persistência;
     */
-    require_once(ROOT . "model/{$class}.php");
+    require_once(DIR_MODEL . "{$class}.php");
   } else {
     /**
     * Carregando utilitários;
     */
-    require_once(ROOT . "util/{$class}.php");
+    require_once(DIR_UTIL . "{$class}.php");
   }
 }
 ?>
