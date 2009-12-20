@@ -58,7 +58,7 @@ abstract class Window {
   * Carrega o arquivo glade da janela, conecta sinais e a exibe.
   */
   public function __construct() {
-    $this->glade = new GladeXML('windows/glade/' . get_class($this) . '.glade');
+    $this->glade = new GladeXML('view/' . get_class($this) . '.glade');
     $this->glade->signal_autoconnect_instance($this);
     $this->window = $this->glade->get_widget(get_class($this));
     $this->window->show_all();
