@@ -88,7 +88,7 @@ function __autoload($class) {
     /**
     * Carregando controladores;
     */
-    require_once(DIR_MODEL . "{$class}.php");
+    require_once(DIR_CONTROLLER . "{$class}.php");
   } else if (is_file(DIR_MODEL . "{$class}.php")) {
     /**
     * Carregando modelos de persistência;

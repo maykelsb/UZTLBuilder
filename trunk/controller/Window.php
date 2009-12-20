@@ -53,6 +53,10 @@ abstract class Window {
   * Referência direta para a janela desenhada no arquivo glade.
   */
   protected $window;
+  /**
+  * Título original da janela.
+  */
+  protected $tituloJanela;
 
   /**
   * Carrega o arquivo glade da janela, conecta sinais e a exibe.
@@ -61,6 +65,7 @@ abstract class Window {
     $this->glade = new GladeXML('view/' . get_class($this) . '.glade');
     $this->glade->signal_autoconnect_instance($this);
     $this->window = $this->glade->get_widget(get_class($this));
+    $this->tituloJanela = $this->window->get_title();
     $this->window->show_all();
   }
 

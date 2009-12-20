@@ -56,14 +56,15 @@ final class WinMain extends Window {
   * @see Window.createFileFilter()
   */
   public function __construct() {
-    /*parent::__construct();
-    $filechooserbutton = $this->get_widget('filechooserbuttonLoadTileset');
+    parent::__construct();
+    /*$filechooserbutton = $this->get_widget('filechooserbuttonLoadTileset');
     $filechooserbutton->add_filter($this->createFileFilter('PNG Tilesets', '*.png'));
     $filechooserbutton->set_current_folder(DIR_PROJETOS);
     $filechooserbutton->add_shortcut_folder(DIR_PROJETOS);*/
   }
 
   private function dlgArquivos($tituloCaixaSelecao, $tipoCaixaSelecao) {
+    $path = null;
     $dlg = new GtkFileChooserDialog($tituloCaixaSelecao,
       null,
       $tipoCaixaSelecao,
@@ -72,12 +73,12 @@ final class WinMain extends Window {
     // -- Caminho padrão de projetos e filtro para tipo de arquivo
     $dlg->set_current_folder(DIR_PROJETOS);
     $dlg->add_filter($this->createFileFilter(Projeto::DESC_TIPO_ARQUIVO_PROJETO,
-                                             '*.'. Projeto::EXTENCAO_ARQUIVO_PROJETO));
+      '*.'. Projeto::EXTENCAO_ARQUIVO_PROJETO));
     if (Gtk::RESPONSE_OK == $dlg->run()) {
-      return $dlg->get_filename();
+      $path = $dlg->get_filename();
     }
     $dlg->destroy();
-    return null;
+    return $path;
   }
 
   /**
@@ -95,15 +96,16 @@ final class WinMain extends Window {
       var_dump($pathSelecionado);
       $this->projeto = Projeto::criarProjeto($pathSelecionado);
     }
+    $this->window->set_title($this->tituloJanela .  '[' . $this->projeto->getPathProjeto() . ']');
   }
 
   public function abrirProjeto() {
     $pathSelecionado = $this->dlgArquivos('Abrir projeto',
       Gtk::FILE_CHOOSER_ACTION_OPEN);
     if (!is_null($pathSelecionado)) {
-      var_dump($pathSelecionado);
       $this->projeto = Projeto::abrirProjeto($pathSelecionado);
     }
+    $this->window->set_title($this->tituloJanela . ' [' . $this->projeto->getPathProjeto() . ']');
   }
 
 
