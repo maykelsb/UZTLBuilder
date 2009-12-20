@@ -151,8 +151,11 @@ final class Projeto {
     return self::$projeto;
   }
 
-  public static function abrirProjeto() {
-    return self::$project;
+  public static function abrirProjeto($path) {
+    if (!is_file($path)) { trigger_error('Não foi possível abrir o projeto.', E_USER_ERROR); }
+    self::$projeto = new Projeto();
+    self::$projeto->carregarXML($path);
+    return self::$projeto;
   }
 
   public function salvarProjeto() {
@@ -167,6 +170,17 @@ final class Projeto {
     }
     return (false !== file_put_contents("{$this->pathProjeto}." . self::EXTENCAO_ARQUIVO_PROJETO,
       $this->xml->saveXML()));
+  }
+
+  public function carregarXML($path) {
+    $this->xml = new DomDocument();
+    if (!$this->xml->loadXML(file_get_contents($path))) {
+      trigger_error('Não foi possível carregar definições do projeto.', E_USER_ERROR);
+    }
+    // -- Carregando atributos para o objeto
+    $projetoNo = $this->xml->getElementsByTagName('projeto')->item(0);
+    $this->pathProjeto = $projetoNo->getAttribute('path');
+    $this->dataCriacao = $projetoNo->getAttribute('criacao');
   }
 }
 ?>
