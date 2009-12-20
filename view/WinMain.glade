@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.3 on Sun Dec 06 20:46:09 2009 -->
+<!--Generated with glade3 3.4.3 on Sun Dec 20 11:12:34 2009 -->
 <glade-interface>
   <widget class="GtkWindow" id="WinMain">
     <property name="width_request">800</property>
@@ -26,7 +26,7 @@
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">New</property>
                 <property name="stock_id">gtk-new</property>
-                <signal name="clicked" handler="createProject"/>
+                <signal name="clicked" handler="criarProjeto"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -37,6 +37,7 @@
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">Open</property>
                 <property name="stock_id">gtk-open</property>
+                <signal name="clicked" handler="abrirProjeto"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
