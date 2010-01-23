@@ -2,7 +2,7 @@
 /**
 * UZTLBuilder
 * An app to build tiled layers for JavaME in PHP-GTK.
-* Copyright (c) 2009 Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>
+* Copyright (c) 2009-2010 Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>
 * -----------------------------------------------------------------------------
 * The contents of this file are subject to the Mozilla Public License
 * Version 1.1 (the "License"); you may not use this file except in
@@ -19,7 +19,7 @@
 *
 * The Initial Developer of the Original Code is
 *   Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>.
-* Portions created by Initial Developer are Copyright (C) 2009
+* Portions created by Initial Developer are Copyright (C) 2009-2010
 * Initial Developer. All Rights Reserved.
 *
 * Contributor(s): None
@@ -43,16 +43,8 @@
 *
 * @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
-abstract class Window {
+abstract class Window extends Controller {
 
-  /**
-  * Referência para objeto glade da janela.
-  */
-  private $glade;
-  /**
-  * Referência direta para a janela desenhada no arquivo glade.
-  */
-  protected $window;
   /**
   * Título original da janela.
   */
@@ -62,11 +54,11 @@ abstract class Window {
   * Carrega o arquivo glade da janela, conecta sinais e a exibe.
   */
   public function __construct() {
-    $this->glade = new GladeXML('view/' . get_class($this) . '.glade');
-    $this->glade->signal_autoconnect_instance($this);
-    $this->window = $this->glade->get_widget(get_class($this));
-    $this->tituloJanela = $this->window->get_title();
-    $this->window->show_all();
+    parent::__construct();
+    $win = get_class($this);
+    $this->tituloJanela = $this->$win->get_title();
+    $this->$win->show_all();
+    unset($win);
   }
 
   /**
@@ -74,20 +66,6 @@ abstract class Window {
   */
   public function closeWindow() {
     Gtk::main_quit();
-  }
-
-  /**
-  * Cria e retorna um filtro de seleção de arquivos.
-  *
-  * @param $filtername string Nome do filtro para leitura humana;
-  * @param $pattern string Padrão de filtragem para seleção de arquivos;
-  * @return GtkFileFilter
-  */
-  protected function createFileFilter($filtername, $pattern) {
-    $filter = new GtkFileFilter();
-    $filter->set_name($filtername);
-    $filter->add_pattern($pattern);
-    return $filter;
   }
 
   /**
@@ -99,13 +77,6 @@ abstract class Window {
       $aboutdialog->run();
       $aboutdialog->destroy();
     }
-  }
-
-  /**
-  * Método de atalho.
-  */
-  protected function get_widget($wdgName) {
-    return $this->glade->get_widget($wdgName);
   }
 }
 ?>
