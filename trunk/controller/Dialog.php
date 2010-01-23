@@ -19,7 +19,7 @@
 *
 * The Initial Developer of the Original Code is
 *   Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>.
-* Portions created by Initial Developer are Copyright (C) 2009
+* Portions created by Initial Developer are Copyright (C) 2009-2010
 * Initial Developer. All Rights Reserved.
 *
 * Contributor(s): None
@@ -38,33 +38,26 @@
 * @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 
-
 /**
 * Classe base para manipulação de dialogs criados com glade.
 *
 * @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
-abstract class Dialog {
-  protected $glade;
-  protected $dialog;
-  
-  public function __construct() {
-    $this->glade = new GladeXML('view/' . get_class($this) . '.glade');
-    $this->dialog = $this->glade->get_widget(get_class($this));
-  }
+abstract class Dialog extends Controller {
 
   /**
   *
   */
   public function __call($funcname, $arguments) {
+    $dlg = get_class($this);
     if (!empty($arguments)) {
-      $strCall = '$this->dialog->'. $funcname . '(';
+      $strCall = '$this->$dlg->'. $funcname . '(';
       foreach ($arguments as $key => $arg) {
         $strCall .= '$arguments[' . $key . '], ';
       }
       return eval(substr($strCall, 0, -2) . ');');
     }
-    return $this->dialog->$funcname();
+    return $this->$dlg->$funcname();
   }
 }
 ?>
