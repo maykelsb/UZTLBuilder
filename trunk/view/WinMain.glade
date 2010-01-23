@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.3 on Sun Dec 20 11:12:34 2009 -->
+<!--Generated with glade3 3.4.3 on Fri Jan 01 22:13:47 2010 -->
 <glade-interface>
   <widget class="GtkWindow" id="WinMain">
     <property name="width_request">800</property>
@@ -22,9 +22,9 @@
             <property name="height_request">55</property>
             <property name="visible">True</property>
             <child>
-              <widget class="GtkToolButton" id="toolbuttonNew">
+              <widget class="GtkToolButton" id="tbtnNovo">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">New</property>
+                <property name="label" translatable="yes">Novo</property>
                 <property name="stock_id">gtk-new</property>
                 <signal name="clicked" handler="criarProjeto"/>
               </widget>
@@ -33,9 +33,9 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbuttonOpen">
+              <widget class="GtkToolButton" id="tbtnAbrir">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Open</property>
+                <property name="label" translatable="yes">Abrir</property>
                 <property name="stock_id">gtk-open</property>
                 <signal name="clicked" handler="abrirProjeto"/>
               </widget>
@@ -44,17 +44,18 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbuttonSave">
+              <widget class="GtkToolButton" id="tbtnSalvar">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Save</property>
+                <property name="label" translatable="yes">Salvar</property>
                 <property name="stock_id">gtk-save</property>
+                <signal name="clicked" handler="salvarProjeto"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkSeparatorToolItem" id="toolbutton4">
+              <widget class="GtkSeparatorToolItem" id="tbtnSeparador1">
                 <property name="visible">True</property>
               </widget>
               <packing>
@@ -63,9 +64,10 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbuttonClear">
+              <widget class="GtkToolButton" id="tbtnLimpar">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Clear</property>
+                <property name="sensitive">False</property>
+                <property name="label" translatable="yes">Limpar</property>
                 <property name="stock_id">gtk-clear</property>
               </widget>
               <packing>
@@ -73,7 +75,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkSeparatorToolItem" id="toolbutton1">
+              <widget class="GtkSeparatorToolItem" id="tbtnSeparador2">
                 <property name="visible">True</property>
               </widget>
               <packing>
@@ -82,9 +84,22 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToggleToolButton" id="toolbuttonShowGrid">
+              <widget class="GtkToolButton" id="tbtnConfigurar">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Grid</property>
+                <property name="label" translatable="yes">Config</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-preferences</property>
+                <signal name="clicked" handler="exibirFormConfiguracao"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkToggleToolButton" id="tbtnExibirGrade">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="label" translatable="yes">Exibir grade</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-zoom-fit</property>
               </widget>
@@ -93,9 +108,10 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbuttonExport">
+              <widget class="GtkToolButton" id="tbtnExportar">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Export</property>
+                <property name="sensitive">False</property>
+                <property name="label" translatable="yes">Exportar</property>
                 <property name="stock_id">gtk-convert</property>
               </widget>
               <packing>
@@ -103,18 +119,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbuttonConfig">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Config</property>
-                <property name="use_underline">True</property>
-                <property name="stock_id">gtk-preferences</property>
-              </widget>
-              <packing>
-                <property name="expand">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkSeparatorToolItem" id="toolbutton2">
+              <widget class="GtkSeparatorToolItem" id="tbtnSeparador3">
                 <property name="visible">True</property>
               </widget>
               <packing>
@@ -123,9 +128,9 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbuttonAbout">
+              <widget class="GtkToolButton" id="tbtnSobre">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">About</property>
+                <property name="label" translatable="yes">Sobre</property>
                 <property name="stock_id">gtk-info</property>
                 <signal name="clicked" handler="showAbout"/>
               </widget>
@@ -134,7 +139,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkSeparatorToolItem" id="toolbutton3">
+              <widget class="GtkSeparatorToolItem" id="tbtnSeparador4">
                 <property name="visible">True</property>
               </widget>
               <packing>
@@ -143,9 +148,9 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbuttonQuit">
+              <widget class="GtkToolButton" id="tbtnSair">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Quit</property>
+                <property name="label" translatable="yes">Sair</property>
                 <property name="stock_id">gtk-quit</property>
                 <signal name="clicked" handler="closeWindow"/>
               </widget>
@@ -160,272 +165,127 @@
           </packing>
         </child>
         <child>
-          <widget class="GtkHBox" id="hboxWorkAreaConfig">
+          <widget class="GtkHBox" id="hbxAplicacao">
             <property name="visible">True</property>
             <child>
-              <widget class="GtkViewport" id="viewportWorkArea">
-                <property name="width_request">550</property>
+              <widget class="GtkScrolledWindow" id="scwAreaTrabalho">
                 <property name="visible">True</property>
-                <property name="resize_mode">GTK_RESIZE_QUEUE</property>
-                <property name="shadow_type">GTK_SHADOW_ETCHED_OUT</property>
+                <property name="can_focus">True</property>
+                <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                 <child>
-                  <placeholder/>
-                </child>
-              </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkVBox" id="vboxConfigSelection">
-                <property name="visible">True</property>
-                <child>
-                  <widget class="GtkFixed" id="fixedConfig">
-                    <property name="visible">True</property>
-                    <child>
-                      <widget class="GtkLabel" id="label1">
-                        <property name="width_request">86</property>
-                        <property name="height_request">20</property>
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Tile dimensions</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSpinButton" id="spinbuttonWidthTile">
-                        <property name="width_request">38</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="editable">False</property>
-                        <property name="adjustment">16 8 64 8 8 10</property>
-                        <property name="climb_rate">8</property>
-                        <property name="snap_to_ticks">True</property>
-                        <property name="numeric">True</property>
-                        <property name="wrap">True</property>
-                      </widget>
-                      <packing>
-                        <property name="x">2</property>
-                        <property name="y">18</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label2">
-                        <property name="width_request">20</property>
-                        <property name="height_request">20</property>
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">x</property>
-                      </widget>
-                      <packing>
-                        <property name="x">38</property>
-                        <property name="y">20</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkSpinButton" id="spinbuttonHeightTile">
-                        <property name="width_request">38</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="editable">False</property>
-                        <property name="adjustment">16 8 64 8 8 10</property>
-                        <property name="climb_rate">8</property>
-                        <property name="snap_to_ticks">True</property>
-                        <property name="numeric">True</property>
-                        <property name="wrap">True</property>
-                      </widget>
-                      <packing>
-                        <property name="x">54</property>
-                        <property name="y">18</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label3">
-                        <property name="width_request">99</property>
-                        <property name="height_request">20</property>
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Background color</property>
-                      </widget>
-                      <packing>
-                        <property name="x">102</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkColorButton" id="colorbuttonBackGColor">
-                        <property name="width_request">75</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="response_id">0</property>
-                        <property name="color">#ffff0000ffff</property>
-                        <signal name="color_set" handler="setBackgroundColor"/>
-                      </widget>
-                      <packing>
-                        <property name="x">102</property>
-                        <property name="y">18</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label4">
-                        <property name="width_request">69</property>
-                        <property name="height_request">20</property>
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Load tileset</property>
-                      </widget>
-                      <packing>
-                        <property name="y">46</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkFileChooserButton" id="filechooserbuttonLoadTileset">
-                        <property name="width_request">246</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                        <property name="title" translatable="yes">Select tileset</property>
-                        <signal name="file_set" handler="loadTileSet"/>
-                      </widget>
-                      <packing>
-                        <property name="x">2</property>
-                        <property name="y">63</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label5">
-                        <property name="width_request">99</property>
-                        <property name="height_request">20</property>
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Number of layers</property>
-                      </widget>
-                      <packing>
-                        <property name="y">91</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkSpinButton" id="spinbutton1">
-                        <property name="width_request">38</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="editable">False</property>
-                        <property name="adjustment">2 1 4 1 1 10</property>
-                        <property name="climb_rate">1</property>
-                        <property name="snap_to_ticks">True</property>
-                        <property name="numeric">True</property>
-                        <property name="wrap">True</property>
-                      </widget>
-                      <packing>
-                        <property name="x">3</property>
-                        <property name="y">107</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label6">
-                        <property name="width_request">70</property>
-                        <property name="height_request">20</property>
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Active layer</property>
-                      </widget>
-                      <packing>
-                        <property name="y">133</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkComboBox" id="combobox1">
-                        <property name="width_request">50</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                      </widget>
-                      <packing>
-                        <property name="x">2</property>
-                        <property name="y">150</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkButton" id="button1">
-                        <property name="width_request">100</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="label" translatable="yes">Create</property>
-                        <property name="response_id">0</property>
-                      </widget>
-                      <packing>
-                        <property name="x">107</property>
-                        <property name="y">141</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label7">
-                        <property name="width_request">100</property>
-                        <property name="height_request">20</property>
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Map size (in tiles)</property>
-                      </widget>
-                      <packing>
-                        <property name="x">103</property>
-                        <property name="y">91</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkSpinButton" id="spinbuttonMapWidth">
-                        <property name="width_request">50</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="adjustment">0 0 1000 1 10 10</property>
-                        <property name="numeric">True</property>
-                      </widget>
-                      <packing>
-                        <property name="x">109</property>
-                        <property name="y">107</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label8">
-                        <property name="width_request">20</property>
-                        <property name="height_request">26</property>
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">x</property>
-                      </widget>
-                      <packing>
-                        <property name="x">156</property>
-                        <property name="y">107</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkSpinButton" id="spinbuttonMapHeight">
-                        <property name="width_request">50</property>
-                        <property name="height_request">25</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="adjustment">0 0 1000 1 10 10</property>
-                        <property name="numeric">True</property>
-                      </widget>
-                      <packing>
-                        <property name="x">174</property>
-                        <property name="y">107</property>
-                      </packing>
-                    </child>
-                  </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkViewport" id="viewportTilesetSelection">
-                    <property name="height_request">300</property>
+                  <widget class="GtkViewport" id="vwpAreaTrabalho">
+                    <property name="width_request">550</property>
                     <property name="visible">True</property>
                     <property name="resize_mode">GTK_RESIZE_QUEUE</property>
                     <property name="shadow_type">GTK_SHADOW_ETCHED_OUT</property>
                     <child>
-                      <placeholder/>
+                      <widget class="GtkFixed" id="fxdAreaTrabalho">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkVBox" id="vbxFerramentasTileset">
+                <property name="visible">True</property>
+                <child>
+                  <widget class="GtkScrolledWindow" id="scrolledwindow1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                    <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                    <child>
+                      <widget class="GtkViewport" id="viewport1">
+                        <property name="height_request">100</property>
+                        <property name="visible">True</property>
+                        <property name="resize_mode">GTK_RESIZE_QUEUE</property>
+                        <child>
+                          <widget class="GtkTreeView" id="tvwLayers">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="headers_clickable">True</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+                <child>
+                  <widget class="GtkHBox" id="hbox1">
+                    <property name="visible">True</property>
+                    <property name="homogeneous">True</property>
+                    <child>
+                      <widget class="GtkButton" id="btnBotaoEsquerdo">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="focus_on_click">False</property>
+                        <property name="response_id">0</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkButton" id="btnBotaoDireito">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="focus_on_click">False</property>
+                        <property name="response_id">0</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkToggleButton" id="tgbtnLimpar">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="label" translatable="yes">gtk-clear</property>
+                        <property name="use_stock">True</property>
+                        <property name="focus_on_click">False</property>
+                        <property name="image_position">GTK_POS_TOP</property>
+                        <property name="response_id">0</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                      <packing>
+                        <property name="position">2</property>
+                      </packing>
                     </child>
                   </widget>
                   <packing>
                     <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkScrolledWindow" id="scwTileset">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                    <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                    <child>
+                      <widget class="GtkViewport" id="vwpTileset">
+                        <property name="width_request">300</property>
+                        <property name="height_request">350</property>
+                        <property name="visible">True</property>
+                        <property name="resize_mode">GTK_RESIZE_QUEUE</property>
+                        <property name="shadow_type">GTK_SHADOW_ETCHED_OUT</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </widget>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </widget>
@@ -436,6 +296,16 @@
           </widget>
           <packing>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkStatusbar" id="statusbar1">
+            <property name="visible">True</property>
+            <property name="spacing">2</property>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </widget>
