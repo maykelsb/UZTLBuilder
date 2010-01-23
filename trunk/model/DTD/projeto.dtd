@@ -1,0 +1,15 @@
+<!DOCTYPE PROJETO [
+<!ELEMENT projeto(configuracao)>
+  <!ATTLIST projeto pathProjeto CDATA #REQUIRED>
+  <!ATTLIST projeto dataCriacao CDATA #REQUIRED>
+  <!ELEMENT configuracao(larguraTile, alturaTile, larguraMapa, alturaMapa,
+                         quantidadeLayers, corDeFundo, pathTileset, linguagemExport)>
+    <!ELEMENT larguraTile (#PCDATA)>
+    <!ELEMENT alturaTile (#PCDATA)>
+    <!ELEMENT larguraMapa (#PCDATA)>
+    <!ELEMENT alturaMapa (#PCDATA)>
+    <!ELEMENT quantidadeLayers (#PCDATA)>
+    <!ELEMENT corDeFundo (#PCDATA)>
+    <!ELEMENT pathTileset (#PCDATA)>
+    <!ELEMENT linguagemExport (#PCDATA)>
+]>
