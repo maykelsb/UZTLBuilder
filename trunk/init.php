@@ -2,7 +2,7 @@
 /**
 * UZTLBuilder
 * An app to build tiled layers for JavaME in PHP-GTK.
-* Copyright (c) 2009 Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>
+* Copyright (c) 2009-2010 Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>
 * -----------------------------------------------------------------------------
 * The contents of this file are subject to the Mozilla Public License
 * Version 1.1 (the "License"); you may not use this file except in
@@ -19,7 +19,7 @@
 *
 * The Initial Developer of the Original Code is
 *   Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>.
-* Portions created by Initial Developer are Copyright (C) 2009
+* Portions created by Initial Developer are Copyright (C) 2009-2010
 * Initial Developer. All Rights Reserved.
 *
 * Contributor(s): None
