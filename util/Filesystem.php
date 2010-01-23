@@ -2,7 +2,7 @@
 /**
 * UZTLBuilder
 * An app to build tiled layers for JavaME in PHP-GTK.
-* Copyright (c) 2009 Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>
+* Copyright (c) 2009-2010 Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>
 * -----------------------------------------------------------------------------
 * The contents of this file are subject to the Mozilla Public License
 * Version 1.1 (the "License"); you may not use this file except in
@@ -19,7 +19,7 @@
 *
 * The Initial Developer of the Original Code is
 *   Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>.
-* Portions created by Initial Developer are Copyright (C) 2009
+* Portions created by Initial Developer are Copyright (C) 2009-2010
 * Initial Developer. All Rights Reserved.
 *
 * Contributor(s): None
@@ -42,10 +42,14 @@
 *
 */
 final class Filesystem {
+  /**
+  *
+  */
   public static final function delDir($dirPath) {
-    $dirPath = self::normalizarPath($dirPath);
-    if (false === strpos($dirPath, ROOT . 'projects')) {
-      trigger_error('Caminho inválido para apagar diretórios.', E_USER_ERROR);
+    if (false === strpos($dirPath, DIR_PROJETOS)) {
+      trigger_error('Caminho inválido para apagar diretórios. Se o seu projeto está salvo '
+        . 'em um lugar diferente do sugerido pelo programa, o diretório \'tiles\' deve '
+        . 'ser apagado manualmente.', E_USER_ERROR);
     }
     if (!is_dir($dirPath)) {
       trigger_error('Caminho informado não é um diretório ou não existe.', E_USER_ERROR);
