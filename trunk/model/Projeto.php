@@ -60,6 +60,11 @@ final class Projeto {
   */
   const EXTENCAO_ARQUIVO_PROJETO = 'utbp';
   /**
+  * Extenção utilizada pelos arquivos de layers.
+  * @const EXTENCAO_ARQUIVO_LAYER
+  */
+  const EXTENCAO_ARQUIVO_LAYER = 'upzlyr';
+  /**
   * Descrição do tipo de arquivo de projeto.
   * @const DESC_TIPO_ARQUIVO_PROJETO
   */
@@ -83,9 +88,8 @@ final class Projeto {
     'quantidadeLayers' => null,
     'corDeFundo' => null,
     'pathTileset' => null,
-    'linguagemExport' => null);
-
-  private $layers;
+    'linguagemExport' => null,
+    'layers' => null);
 
   /**
   * Retorna as propriedades da classe.
@@ -107,19 +111,17 @@ final class Projeto {
     if (!array_key_exists($prop, $this->propriedades)) {
       trigger_error("Propriedade ({$prop}) do projeto não definida!", E_USER_ERROR);
     }
-    if ('pathTileset' == $prop) {
-      // -- Copiando o tileset para o diretório de trabalho
+    switch ($prop) {
+    case 'pathTileset':
       $pathOrigemTileset = $valor;
-      if (!empty($pathOrigemTileset)) {
-        $pathDestinoTileset = $this->pathProjeto . DIRECTORY_SEPARATOR . 'tileset.png';
+      $pathDestinoTileset = $this->pathProjeto . DIRECTORY_SEPARATOR . 'tileset.png';
+      if (($pathOrigemTileset != $pathDestinoTileset) && !empty($pathOrigemTileset)) {
         if (!copy($pathOrigemTileset, $pathDestinoTileset)) {
           trigger_error('Falha ao copiar tileset para diretório de trabalho.', E_USER_ERROR);
         }
-        $this->propriedades[$prop] = $pathDestinoTileset;
         $this->quebrarTileset();
       }
-    } else {
-      $this->propriedades[$prop] = $valor;
+    default: $this->propriedades[$prop] = $valor;
     }
   }
 
@@ -247,8 +249,61 @@ final class Projeto {
   * Cria o conjunto de layers do projeto.
   */
   public function criarLayers() {
-    $this->layers = new Layers($this);
-    $this->layers->criarLayers();
+    $this->layers = array_pad(
+      $this->layers,
+      $this->quantidadeLayers,
+      Layer::novaLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa));
+  }
+
+  /**
+  * Adiciona uma nova layer em branco ao projeto.
+  * @param int $pos Posição de inserção da nova camada.
+  */
+  public function adicionarLayer($pos = null) {
+    if (array_key_exists($pos, $this->layers)) {
+      $tmpArray = array();
+      foreach ($this->layers as $key => $item) {
+        if ($key < $pos) { $tmpArray[$key] = $item; } // -- Itens anteriores ao novo
+        else if ($key > $pos) { $tmpArray[$key + 1] = $item; } // -- Itens posteriores ao novo
+        else { // -- Posição de inserção
+          $tmpArray[$key] = Layer::novaLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
+        }
+      }
+      $this->layers = $tmpArray;
+    } else { // -- Posição não existe ou é nula
+      $this->layers[] = Layer::novaLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
+    }
+  }
+
+  /**
+  * Remove a layer na posição indica e reseta as chaves do array de layers.
+  * @param int $pos Posição da camada a ser removida.
+  */
+  public function removerLayer($pos) {
+    unset($this->layers[$pos]);
+    // -- Resetando chaves do array de layers
+    $this->layers = array_values($this->layers);
+  }
+
+  /**
+  * Salva as layers do projeto.
+  * @see Layer
+  */
+  public function salvarLayers() {
+    foreach ($this->layers as $layer) {
+      $layer->salvarLayer($this->pathProjeto);
+    }
+  }
+
+  /**
+  * Carrega as layers salvas no diretório do projeto.
+  * @see Layer
+  */
+  public function carregarLayers() {
+    $fltLayers = $this->projeto->pathProjeto . DIRECTORY_SEPARATOR . '*.' . self::EXTENCAO_ARQUIVO_LAYER;
+    foreach (sort(glob($fltLayers)) as $XMLLayer) {
+      $this->layers[] = Layer::carregarLayerXML($XMLLayer);
+    }
   }
 }
 ?>

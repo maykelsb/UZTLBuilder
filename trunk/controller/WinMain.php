@@ -132,11 +132,6 @@ final class WinMain extends Window {
       $retConfig = $dlg->run();
       $dlg->destroy();
       return $retConfig;
-      //if (DlgConfig::BOTAO_OK == $dlg->run()) {
-        //$this->atualizarFormulario();
-      //}
-      //$dlg->destroy();
-      //return;
     }
     trigger_error('Nenhum projeto aberto para configuração.', E_USER_ERROR);
   }
@@ -155,60 +150,10 @@ final class WinMain extends Window {
     $this->atualizarTitulo();
     $this->atualizarCorDeFundo();
     $this->carregarTileset();
-
-      
-      // -- Carrega lista de layers
-      #TODO Carregar nome do arquivo de camadas
-      if (!is_null($this->projeto->quantidadeLayers)) {
-        // -- Quando edita a configuração, precisa remover as colunas existentes
-        foreach ($this->tvwLayers->get_columns() as $column) { $this->tvwLayers->remove_column($column); }
-        $model = new GtkListStore(GdkPixbuf::gtype, TYPE_STRING);
-        $this->tvwLayers->append_column(new GtkTreeViewColumn('Exibir', new GtkCellRendererPixBuf(), 'pixbuf', 0));
-        $this->tvwLayers->append_column(new GtkTreeViewColumn('Layer', new GtkCellRendererText(), 'text', 1));
-        $this->tvwLayers->set_model($model);
-        for ($x = 1; $x <= $this->projeto->quantidadeLayers; $x++) {
-          $model->append(
-            array(
-              GdkPixbuf::new_from_file(DIR_VIEW . 'imagens' . DIRECTORY_SEPARATOR . 'layer_visivel.png'),
-              "Layer {$x}"));
-        }
-      }
-
-      // -- Carregando área de trabalho
-      if ((!is_null($this->projeto->larguraMapa)) && (!is_null($this->projeto->alturaMapa))) {
-
-        foreach ($this->fxdAreaTrabalho->get_children() as $child) {
-          $this->fxdAreaTrabalho->remove($child);
-        }
-
-        for ($x = 0; $x < $this->projeto->quantidadeLayers; $x++) {
-          $tblLayer = new GtkTable(
-            (int)$this->projeto->larguraMapa,
-            (int)$this->projeto->alturaMapa);
-          $tblLayer->set_row_spacings(0);
-          $tblLayer->set_col_spacings(0);
-          $tblLayer->set_border_width(1);
-          
-          // -- Carregando layers já construídas
-          for ($x1 = 0; $x1 < $this->projeto->larguraMapa; $x1++) {
-            //for ($y1 = 0; $y1 < $this->projeto->alturaMapa; $y1++) {
-          //for ($x1 = 0; $x1 < 10; $x1++) {
-            for ($y1 = 0; $y1 < 10; $y1++) {
-              if (0 == $x) {
-                $imgTile = GtkImage::new_from_file(sprintf("{$pathTile}01-06.png"));
-              } else {
-                $imgTile = GtkImage::new_from_file(sprintf("{$pathTile}02-03.png"));
-              }
-              $tblLayer->attach($imgTile, $x1, $x1 + 1, $y1, $y1 + 1,
-                Gtk::EXPAND + Gtk::FILL,
-                Gtk::EXPAND + Gtk::FILL,
-                0, 0);
-            }
-          }
-          $this->fxdAreaTrabalho->put($tblLayer, 0, 0);
-        }
-      }
-      $this->WinMain->show_all();
+    $this->carregarListaLayers();
+    $this->carregarAreaTrabalho();
+    // -- Exibindo alterações
+    $this->WinMain->show_all();
   }
 
   private function atualizarTitulo() {
@@ -232,8 +177,8 @@ final class WinMain extends Window {
       list($larguraTileset, $alturaTileset) = getimagesize($this->projeto->pathTileset);
       $tblTiles = new GtkTable(($larguraTileset / $this->projeto->larguraTile),
         ($alturaTileset / $this->projeto->alturaTile));
-      $tblTiles->set_row_spacings(0);
-      $tblTiles->set_col_spacings(0);
+      $tblTiles->set_row_spacings(1);
+      $tblTiles->set_col_spacings(1);
       $tblTiles->set_border_width(1);
       // -- Carregando tiles
       $pathTile = $this->projeto->pathProjeto . DIRECTORY_SEPARATOR . Projeto::PATH_TILES . DIRECTORY_SEPARATOR;
@@ -248,6 +193,57 @@ final class WinMain extends Window {
     }
   }
 
-  
+  /**
+  * Cria a lista de layers de acordo com a quantidade de layers para o projeto.
+  * @todo Verificar se foi definido um nome para a layers e carregá-los.
+  */
+  private function carregarListaLayers() {
+    if (!is_null($this->projeto->quantidadeLayers)) {
+      // -- Quando edita a configuração, precisa remover as colunas existentes
+      foreach ($this->tvwLayers->get_columns() as $column) { $this->tvwLayers->remove_column($column); }
+      $model = new GtkListStore(GdkPixbuf::gtype, TYPE_STRING);
+      $this->tvwLayers->append_column(new GtkTreeViewColumn('Exibir', new GtkCellRendererPixBuf(), 'pixbuf', 0));
+      $this->tvwLayers->append_column(new GtkTreeViewColumn('Layer', new GtkCellRendererText(), 'text', 1));
+      $this->tvwLayers->set_model($model);
+      #TODO Verificar se foi definido um nome para a layers e carregá-los
+      for ($x = 1; $x <= $this->projeto->quantidadeLayers; $x++) {
+          $model->append(
+            array(
+              GdkPixbuf::new_from_file(DIR_VIEW . 'imagens' . DIRECTORY_SEPARATOR . 'layer_visivel.png'),
+              "Layer {$x}"));
+      }
+    }
+  }
+
+  private function carregarAreaTrabalho() {
+    if ((!is_null($this->projeto->larguraMapa)) && (!is_null($this->projeto->alturaMapa))) {
+      // -- removendo as tabelas de camadas já construídas
+      foreach ($this->fxdAreaTrabalho->get_children() as $child) {
+        $this->fxdAreaTrabalho->remove($child);
+      }
+      // -- Criando as layers do projeto
+      foreach ($this->projeto->layers as $layer) {
+        // -- Criando a tabela de tiles da layer
+        $tblLayer = new GtkTable(
+          (int)$this->projeto->larguraMapa,
+          (int)$this->projeto->alturaMapa);
+        $tblLayer->set_row_spacings(1);
+        $tblLayer->set_col_spacings(1);
+        $tblLayer->set_border_width(1);
+        foreach ($layer as $col => $linhaTiles) {
+          foreach ($linhaTiles as $row => $tile) {
+            if (!is_null($tile)) {
+              $tblLayer->attach(GtkImage::new_from_file("{$pathTile}{$tile}.png"),
+                $col, $col + 1, $row, $row + 1,
+                Gtk::EXPAND + Gtk::FILL,
+                Gtk::EXPAND + Gtk::FILL,
+                0, 0);
+            }
+          }
+        }
+        $this->fxdAreaTrabalho->put($tblLayer, 0, 0);
+      }
+    }
+  }
 }
 ?>
