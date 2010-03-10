@@ -119,9 +119,7 @@ final class WinMain extends Window {
   * Este método é utilizado como callback quando o botão 'tbtbSalvar' é pressionado.
   * @see Projeto::salvarProjeto()
   */
-  public function salvarProjeto() {
-    $this->projeto->salvarProjeto();
-  }
+  public function salvarProjeto() { $this->projeto->salvarProjeto(); }
 
   /**
   * Abre o formulário de configuração do projeto.
@@ -234,6 +232,12 @@ final class WinMain extends Window {
           foreach ($linhaTiles as $row => $tile) {
             if (!is_null($tile)) {
               $tblLayer->attach(GtkImage::new_from_file("{$pathTile}{$tile}.png"),
+                $col, $col + 1, $row, $row + 1,
+                Gtk::EXPAND + Gtk::FILL,
+                Gtk::EXPAND + Gtk::FILL,
+                0, 0);
+            } else {
+              $tblLayer->attach(new GtkFrame(),
                 $col, $col + 1, $row, $row + 1,
                 Gtk::EXPAND + Gtk::FILL,
                 Gtk::EXPAND + Gtk::FILL,

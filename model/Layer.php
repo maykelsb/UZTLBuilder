@@ -43,11 +43,16 @@
 * @see ArrayIterator
 * @final
 * @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
+* @property int $id ID da classe;
+* @property string $nome Nome da classe se renomeada;
+* @property int $larguraLayer Largura da layer em tiles;
+* @property int $alturaLayer Altura da layer em tiles;
 */
-final class Layer extends UpzArrayIterator {
+final class Layer extends ArrayIterator {
 
   /**
-  *
+  * Propriedades da classe de layer.
+  * @var array
   */
   private $propriedades = array(
     'id' => null,
@@ -83,7 +88,7 @@ final class Layer extends UpzArrayIterator {
   /**
   *
   */
-  private function __construct($larguraLayer, $alturaLayer) {
+  public function __construct($larguraLayer, $alturaLayer) {
     $this->larguraLayer = $larguraLayer;
     $this->alturaLayer = $alturaLayer;
     // -- Criando as linhas de cada camada
@@ -95,18 +100,11 @@ final class Layer extends UpzArrayIterator {
   /**
   * @static
   */
-  public static function novaLayer($larguraLayer, $alturaLayer) {
-    return new Layer($larguraLayer, $alturaLayer);
-  }
-
-  /**
-  * @static
-  */
-  public static function novaLayerDeXML($pathXMLDaLayer, $larguraLayer, $alturaLayer) {
+  public static function carregarLayerXML($pathXMLDaLayer) {
     if (!($spXML = simplexml_load_file($pathXMLDaLayer))) {
       trigger_error('Não foi possível carregar as definições da layer.', E_USER_ERROR);
     }
-    $layer = new Layer($larguraLayer, $alturaLayer);
+    $layer = new Layer(5, 5);
     // -- Atributos da layer
     foreach ($spXML->attributes as $key => $valor) { $layer->$key = (string)$valor; }
     // -- Carregando linhas da layer

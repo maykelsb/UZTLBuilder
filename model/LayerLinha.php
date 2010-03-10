@@ -1,16 +1,20 @@
 <?php
-final class LayerLinha extends UpzArrayIterator {
-
+final class LayerLinha extends ArrayIterator {
   public function __construct($larguraLinha) {
-    $this->elementos = array_pad($this->elementos, $larguraLinha, null);
+    for ($x = 0; $x < $larguraLinha; $x++) { $this->append(null); }
   }
   
   public function aumentarLargura($novaLargura) {
-    $this->elementos = array_pad($this->elementos, $novaLargura, null);
+    for ($x = $this->count(); $x < $novaLargura; $x++) { $this->append(null); }
   }
   
   public function diminuirLargura($novaLargura) {
-    $this->elementos = array_slice($this->elementos, 0, $novaLargura);
+    $arr = $this->getArrayCopy();
+    parent::__construct();
+    foreach ($arr as $key => $value) {
+      $this->append($value);
+      if ($this->count() == $novaLargura) { break; }
+    }
   }
 }
 ?>
