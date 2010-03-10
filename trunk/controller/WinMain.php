@@ -175,15 +175,18 @@ final class WinMain extends Window {
       list($larguraTileset, $alturaTileset) = getimagesize($this->projeto->pathTileset);
       $tblTiles = new GtkTable(($larguraTileset / $this->projeto->larguraTile),
         ($alturaTileset / $this->projeto->alturaTile));
-      $tblTiles->set_row_spacings(1);
-      $tblTiles->set_col_spacings(1);
-      $tblTiles->set_border_width(1);
+      //$tblTiles->set_row_spacings(1);
+      //$tblTiles->set_col_spacings(1);
+      //$tblTiles->set_border_width(1);
       // -- Carregando tiles
       $pathTile = $this->projeto->pathProjeto . DIRECTORY_SEPARATOR . Projeto::PATH_TILES . DIRECTORY_SEPARATOR;
       for ($x = 0; $x < ($larguraTileset / $this->projeto->larguraTile); $x++) {
         for ($y = 0; $y < ($alturaTileset / $this->projeto->alturaTile); $y++) {
-          $imgTile = GtkImage::new_from_file(sprintf("{$pathTile}%02d-%02d.png", $x, $y));
-          $tblTiles->attach($imgTile, $x, $x + 1, $y, $y + 1,
+          $frmTile = new GtkFrame();
+          $frmTile->set_size_request((int)$this->projeto->larguraTile + 2,
+            (int)$this->projeto->alturaTile + 2);
+          $frmTile->add(GtkImage::new_from_file(sprintf("{$pathTile}%02d-%02d.png", $x, $y)));
+          $tblTiles->attach($frmTile, $x, $x + 1, $y, $y + 1,
             Gtk::EXPAND + Gtk::FILL, Gtk::EXPAND + Gtk::FILL, 0, 0);
         }
       }
@@ -221,27 +224,21 @@ final class WinMain extends Window {
       }
       // -- Criando as layers do projeto
       foreach ($this->projeto->layers as $layer) {
-        // -- Criando a tabela de tiles da layer
-        $tblLayer = new GtkTable(
-          (int)$this->projeto->larguraMapa,
-          (int)$this->projeto->alturaMapa);
-        $tblLayer->set_row_spacings(1);
-        $tblLayer->set_col_spacings(1);
-        $tblLayer->set_border_width(1);
+        // -- Criando a tabela de tiles da layer com tamanho suficiente para o frame que abrigará o tile
+        $tblLayer = new GtkTable((int)$this->projeto->larguraMapa * ((int)$this->projeto->larguraTile + 2),
+          (int)$this->projeto->alturaMapa * ((int)$this->projeto->alturaTile + 2));
         foreach ($layer as $col => $linhaTiles) {
           foreach ($linhaTiles as $row => $tile) {
-            if (!is_null($tile)) {
-              $tblLayer->attach(GtkImage::new_from_file("{$pathTile}{$tile}.png"),
-                $col, $col + 1, $row, $row + 1,
-                Gtk::EXPAND + Gtk::FILL,
-                Gtk::EXPAND + Gtk::FILL,
-                0, 0);
-            } else {
-              $tblLayer->attach(new GtkFrame(),
-                $col, $col + 1, $row, $row + 1,
-                Gtk::EXPAND + Gtk::FILL,
-                Gtk::EXPAND + Gtk::FILL,
-                0, 0);
+            $frmTile = new GtkFrame();
+            $frmTile->set_size_request((int)$this->projeto->larguraTile + 2,
+              (int)$this->projeto->alturaTile + 2);
+            if (!is_null($tile)) { // -- Adicionando um tile previamente selecionado
+              $frmTile->add(GtkImage::new_from_file("{$pathTile}{$tile}.png"));
+              $tblLayer->attach($frmTile, $col, $col + 1, $row, $row + 1,
+                Gtk::EXPAND + Gtk::FILL, Gtk::EXPAND + Gtk::FILL, 0, 0);
+            } else { // -- Criando uma posição vazia para, posteriormente, adicionar um novo tile
+              $tblLayer->attach($frmTile, $col, $col + 1, $row, $row + 1,
+                Gtk::EXPAND + Gtk::FILL, Gtk::EXPAND + Gtk::FILL, 0, 0);
             }
           }
         }
