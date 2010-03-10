@@ -89,7 +89,7 @@ final class Projeto {
     'corDeFundo' => null,
     'pathTileset' => null,
     'linguagemExport' => null,
-    'layers' => null);
+    'layers' => array());
 
   /**
   * Retorna as propriedades da classe.
@@ -184,7 +184,7 @@ final class Projeto {
     $elmRoot->setAttributeNode(new DOMAttr('dataCriacao', $this->dataCriacao));
     $elmConfig = $elmRoot->appendChild(new DomElement('configuracao'));
     foreach ($this->propriedades as $key => $valor) {
-      if ((!in_array($key, array('pathProjeto', 'dataCriacao'))) && (!is_null($this->$key))) {
+      if ((!in_array($key, array('pathProjeto', 'dataCriacao', 'layers'))) && (!is_null($this->$key))) {
         $elmConfig->appendChild(new DomElement($key, $this->$key));
       }
     }
@@ -252,7 +252,7 @@ final class Projeto {
     $this->layers = array_pad(
       $this->layers,
       $this->quantidadeLayers,
-      Layer::novaLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa));
+      new Layer($this->larguraMapa, $this->alturaMapa));
   }
 
   /**
