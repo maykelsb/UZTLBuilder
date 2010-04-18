@@ -38,18 +38,45 @@
 * @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 
+    /*switch ($prop) {
+    case 'pathTileset':
+      //$pathOrigemTileset = $valor;
+      //$pathDestinoTileset = $this->pathProjeto . DIRECTORY_SEPARATOR . 'tileset.png';
+      if (($pathOrigemTileset != $pathDestinoTileset) && !empty($pathOrigemTileset)) {
+        if (!copy($pathOrigemTileset, $pathDestinoTileset)) {
+          trigger_error('Falha ao copiar tileset para diretório de trabalho.', E_USER_ERROR);
+        }
+        $this->quebrarTileset();
+        $pathDestinoTileset = $valor;
+      }
+    default: $this->propriedades[$prop] = $valor;
+    }*/
+
+
+
 /**
 * Classe de persistência de projetos.
 *
 * Faz o controle de persistência dos projetos como: criar, carregar, abrir e salvar.
 * Também define informações sobre tipo de arquivo.
-* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
+* @property string $nomeProjeto Nome do projeto, o nome do arquivo de configuração e do diretório de trabalho do projeto;
+* @property int $larguraTile
+* @property int $alturaTile
+* @property int $larguraMapa
+* @property int $alturaMapa
+* @property int $quantidadeLayers
+* @property string $corDeFundo
+* @property string $pathTileset
+* @property string $linguagemExport
 * @final
+*
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 final class Projeto {
 
   /**
   * Referência para instância desta classe.
+  * @var Projeto
   * @see Projeto
   */
   private static $projeto = null;
@@ -58,12 +85,12 @@ final class Projeto {
   * Extenção utilizada pelos arquivos de definição de projetos.
   * @const EXTENCAO_ARQUIVO_PROJETO
   */
-  const EXTENCAO_ARQUIVO_PROJETO = 'utbp';
+  const EXTENCAO_ARQUIVO_PROJETO = 'uzp';
   /**
   * Extenção utilizada pelos arquivos de layers.
   * @const EXTENCAO_ARQUIVO_LAYER
   */
-  const EXTENCAO_ARQUIVO_LAYER = 'upzlyr';
+  const EXTENCAO_ARQUIVO_LAYER = 'uzl';
   /**
   * Descrição do tipo de arquivo de projeto.
   * @const DESC_TIPO_ARQUIVO_PROJETO
@@ -76,11 +103,30 @@ final class Projeto {
   const PATH_TILES = 'tiles';
 
   /**
-  *
+  * Caminho do projeto.
+  * @var string
+  */
+  private $pathProjeto = '';
+
+  /**
+  * Data de criação do projeto no formato 'Ymd';
+  * @var string
+  */
+  private $dataCriacao = '';
+
+  /**
+  * Armazena as layers do projeto.
+  * @var array
+  */
+  private $layers = array();
+
+  /**
+  * Propriedades de configuração do projeto.
+  * @var array
+  * @see Projeto
   */
   private $propriedades = array(
-    'pathProjeto' => null,
-    'dataCriacao' => null,
+    'nomeProjeto' => null,
     'larguraTile' => null,
     'alturaTile' => null,
     'larguraMapa' => null,
@@ -88,41 +134,29 @@ final class Projeto {
     'quantidadeLayers' => null,
     'corDeFundo' => null,
     'pathTileset' => null,
-    'linguagemExport' => null,
-    'layers' => array());
+    'linguagemExport' => null);
 
   /**
   * Retorna as propriedades da classe.
-  * @param $prop String Nome da propriedade da classe.
+  * @param string $prop Nome da propriedade da classe.
   */
   public function __get($prop) {
-    if (!array_key_exists($prop, $this->propriedades)) {
-      trigger_error("Propriedade ({$prop}) do projeto não definida!", E_USER_ERROR);
-    }
-    return $this->propriedades[$prop];
+    if (($prop != 'propriedades')
+        && array_key_exists($prop, get_class_vars(__CLASS__))) { return $this->$prop;
+    } else if (array_key_exists($prop, $this->propriedades)) { return $this->propriedades[$prop];
+    } else { trigger_error("Propriedade ({$prop}) do projeto não definida!", E_USER_ERROR); }
   }
 
   /**
   * Define um valor para as propriedade das clase.
-  * @param $prop String Nome da propriedade da classe.
-  * @param $valor mixed Novo valor para a propriedade da classe.
+  * @param string $prop Nome da propriedade;
+  * @param mixed $valor Novo valor para a propriedade;
   */
   public function __set($prop, $valor) {
-    if (!array_key_exists($prop, $this->propriedades)) {
-      trigger_error("Propriedade ({$prop}) do projeto não definida!", E_USER_ERROR);
-    }
-    switch ($prop) {
-    case 'pathTileset':
-      $pathOrigemTileset = $valor;
-      $pathDestinoTileset = $this->pathProjeto . DIRECTORY_SEPARATOR . 'tileset.png';
-      if (($pathOrigemTileset != $pathDestinoTileset) && !empty($pathOrigemTileset)) {
-        if (!copy($pathOrigemTileset, $pathDestinoTileset)) {
-          trigger_error('Falha ao copiar tileset para diretório de trabalho.', E_USER_ERROR);
-        }
-        $this->quebrarTileset();
-      }
-    default: $this->propriedades[$prop] = $valor;
-    }
+    if (($prop != 'propriedades')
+        && array_key_exists($prop, get_class_vars(__CLASS__))) { $this->$prop = $valor;
+    } else if (array_key_exists($prop, $this->propriedades)) { $this->propriedades[$prop] = $valor;
+    } else { trigger_error("Propriedade ({$prop}) do projeto não definida!", E_USER_ERROR); }
   }
 
   /**
@@ -136,23 +170,17 @@ final class Projeto {
   private function __construct() { }
 
   /**
-  * Cria um novo projeto e retorna referência a ele.
+  * Cria um projeto e armazena o caminho do projeto, o nome e a data de criação.
   *
-  * Recebe o path de armazenamento do projeto e cria a estrutura base do arquivo
-  * de definição do projeto. Também executa a criação do diretório do projeto,
-  * onde serão armazenados arquivos temporários do projeto.
-  * Sempre é criado um novo projeto e sua referência é salva dentro da classe, 
-  * o que faz com que referências externas também sejam atualizadas de acordo
-  * com o novo objeto criado.
-  * @param $path string Path para criação do projeto.
+  * @param string $path Caminho onde o projeto será salvo;
+  * @param string $nome O nome do projeto, e do diretório do projeto;
   * @return Projeto Referência para o projeto.
   */
-  public static function criarProjeto($path) {
-    // -- Criação do diretório de trabalho
-    if (!mkdir($path)) { trigger_error('Não foi possível criar o diretório do projeto.', E_USER_ERROR); }
+  public static function criarProjeto($path, $nome) {
     // -- Criação do objeto do projeto e criação das layers
     self::$projeto = new Projeto();
     self::$projeto->pathProjeto = $path;
+    self::$projeto->nomeProjeto = $nome;
     self::$projeto->dataCriacao = date('Ymd');
     return self::$projeto;
   }
@@ -162,7 +190,7 @@ final class Projeto {
   *
   * O projeto é aberto e sua referência é salva dentro da classe, desta forma
   * quando o projeto é aberto, sua referência é atualizada para o novo projeto
-  * @param $path String Caminho do arquivo de referência do projeto.
+  * @param string $path Caminho do arquivo de referência do projeto.
   * @return Projeto
   */
   public static function abrirProjeto($path) {
@@ -183,14 +211,23 @@ final class Projeto {
     $elmRoot->setAttributeNode(new DOMAttr('pathProjeto', $this->pathProjeto));
     $elmRoot->setAttributeNode(new DOMAttr('dataCriacao', $this->dataCriacao));
     $elmConfig = $elmRoot->appendChild(new DomElement('configuracao'));
+    // -- Adicionando propriedades de configuração ao XML
     foreach ($this->propriedades as $key => $valor) {
-      if ((!in_array($key, array('pathProjeto', 'dataCriacao', 'layers'))) && (!is_null($this->$key))) {
-        $elmConfig->appendChild(new DomElement($key, $this->$key));
-      }
+      $elmConfig->appendChild(new DomElement($key, $this->$key));
     }
     // -- Salvando o XML de configuração do projeto
-    return (false !== file_put_contents("{$this->pathProjeto}." . self::EXTENCAO_ARQUIVO_PROJETO,
-      $domDoc->saveXML()));
+    if (!file_put_contents("{$this->pathProjeto}." . self::EXTENCAO_ARQUIVO_PROJETO, $domDoc->saveXML())) {
+      trigger_error('Não foi possível salvar o arquivo de configuração do projeto.', E_USER_ERROR);
+    }
+    // -- Criando diretório de trabalho, se já não foi criado pela janela de configuração
+    if (!is_dir($this->pathProjeto)) {
+      if (!mkdir($this->pathProjeto)) {
+        trigger_error('Não foi possível criar o diretório de trabalho do projeto.');
+      }
+    }
+    // -- Salvando o XML das layers
+    foreach ($this->layers as $oLayer) { $oLayer->salvarLayer($this->pathProjeto); }
+    return true;
   }
 
   /**
@@ -198,7 +235,7 @@ final class Projeto {
   *
   * Lê o XML em um objeto simplexml e carrega as propriedades do projeto e das
   * configurações do projeto no objeto do projeto.
-  * @param String $path Path onde está salvo o xml de configuração (com a extenção do projeto).
+  * @param string $path Path onde está salvo o xml de configuração (com a extenção do projeto).
   * @see Projeto::EXTENCAO_ARQUIVO_PROJETO
   */
   public function carregarXML($path) {
@@ -253,6 +290,7 @@ final class Projeto {
       $this->layers,
       $this->quantidadeLayers,
       new Layer($this->larguraMapa, $this->alturaMapa));
+
   }
 
   /**

@@ -60,7 +60,7 @@ class DlgConfig extends Dialog {
 
   /**
   * Referência para o projeto aberto.
-  * @var $projeto Projeto
+  * @var Projeto $projeto
   */
   private $projeto;
 
@@ -70,14 +70,13 @@ class DlgConfig extends Dialog {
   * Inicializa a caixa de diálogo para exibição dos controles de configuração. Os
   * controles são inicializados com valores padrões a menos que o projeto já esteja
   * configurado previamente, quando eles assumem os valores já definidos.
-  * @param $prj Projeto Referência para o projeto.
+  * @param Projeto $prj Referência para o projeto.
   */
   public function __construct(Projeto &$prj) {
     parent::__construct();
     $this->projeto = $prj;
     // -- Filtros e diretório inicial
-    $this->fcbCarrTileset->add_filter($this->createFileFilter('Arquivos PNG',
-      '*.png'));
+    $this->fcbCarrTileset->add_filter($this->createFileFilter('Arquivos PNG', '*.png'));
     // -- Inicializar comboboxes de dimensões dos tiles
     $arTamTiles = array(8, 16, 32, 64);
     $keyLargura = 1;
@@ -95,9 +94,9 @@ class DlgConfig extends Dialog {
     unset($arTamTiles, $keyLargura, $keyAltura);
     // -- Inicializa dimensões do mapa
     if (!is_null($prj->larguraMapa)) { $this->spbLarguraMapa->set_value($prj->larguraMapa); }
-      else { $this->spbLarguraMapa->set_value(500); }
+      else { $this->spbLarguraMapa->set_value(10); }
     if (!is_null($prj->alturaMapa)) { $this->spbAlturaMapa->set_value($prj->alturaMapa); }
-      else { $this->spbAlturaMapa->set_value(500); }
+      else { $this->spbAlturaMapa->set_value(10); }
     // -- Quantidade de layers
     if (!is_null($prj->quantidadeLayers)) { $this->spbQtdLayers->set_value($prj->quantidadeLayers); }
     // -- Cor de fundo

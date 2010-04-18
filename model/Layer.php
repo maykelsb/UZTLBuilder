@@ -50,6 +50,8 @@
 */
 final class Layer extends ArrayIterator {
 
+  const EXTENCAO_ARQUIVO_LAYER = '.upl';
+
   /**
   * Propriedades da classe de layer.
   * @var array
@@ -121,17 +123,19 @@ final class Layer extends ArrayIterator {
     $elmRoot = $domDoc->appendChild(new DomElement('layer'));
     $elmRoot->setAttributeNode(new DOMAttr('id', $this->id));
     $elmRoot->setAttributeNode(new DOMAttr('nome', $this->nome));
+
     foreach ($this as $keyRow => $row) {
-      $rowTile = new DomElement('row');
-      $rowTile->setAttributeNode(new DOMAttr('num', $keyRow));
-      $elmRoot->appendChild($rowTile);
+      $rowTile = $elmRoot->appendChild(new DomElement('row'));
       foreach ($row as $keyCol => $col) {
-        $colTile = new DomElement('col', (string)$col);
-        $colTile->setAttributeNode(new DOMAttr('num', $keyCol));
-        $rowTile->appendChild($colTile);
+        $colTile = $rowTile->appendChild(new DomElement('col', (string)$col));
       }
     }
-    $pathLayer = $path . sprintf("%02d", $this->id) . Layers::EXTENCAO_ARQUIVO_LAYER;
+
+    // -- Salvando arquivo de conteúdo da layer
+    $pathLayer = $path . sprintf("%02d", $this->id) . self::EXTENCAO_ARQUIVO_LAYER;
+    
+    var_dump($pathLayer);
+    
     if (false !== file_put_contents($pathLayer, $domDoc->saveXML())) {
       trigger_error('Não foi possível salvar definições de layer', E_USER_ERROR);
     }

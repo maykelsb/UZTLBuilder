@@ -3,7 +3,7 @@ final class LayerLinha extends ArrayIterator {
   public function __construct($larguraLinha) {
     for ($x = 0; $x < $larguraLinha; $x++) { $this->append(null); }
   }
-  
+
   public function aumentarLargura($novaLargura) {
     for ($x = $this->count(); $x < $novaLargura; $x++) { $this->append(null); }
   }

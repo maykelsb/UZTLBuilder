@@ -50,7 +50,7 @@ final class WinMain extends Window {
   * Referência para o projeto e sua configuração.
   * @var Projeto
   */
-  private $projeto;
+  private $projeto = null;
 
   private $tilesSelecionados = array(
     'principal' => null,
@@ -91,12 +91,16 @@ final class WinMain extends Window {
   */
   public function criarProjeto() {
     $pathSelecionado = $this->dlgArquivos('Criar projeto', Gtk::FILE_CHOOSER_ACTION_SAVE);
+    // -- Se foi selecionado algum path, cria o projeto e ativa os botões
     if (!is_null($pathSelecionado)) {
-      $this->projeto = Projeto::criarProjeto($pathSelecionado);
-      if (DlgConfig::BOTAO_OK == $this->exibirFormConfiguracao()) {
-        $this->projeto->criarLayers();
-        $this->projeto->salvarProjeto();
-        $this->atualizarFormulario();
+      $nomeProjeto = substr($pathSelecionado, strrpos($pathSelecionado, DIRECTORY_SEPARATOR) + 1);
+      // -- Armazena referência do projeto criado
+      $this->projeto = Projeto::criarProjeto($pathSelecionado, $nomeProjeto);
+      $this->WinMain->set_title("{$this->tituloJanela} [{$nomeProjeto}]");
+      if (!is_null($this->projeto)) {
+        // -- Após criar o projeto, habilite os botões de configuração e de salvar
+        $this->tbtnSalvar->set_sensitive(true);
+        $this->tbtnConfigurar->set_sensitive(true);
       }
     }
   }
@@ -115,11 +119,14 @@ final class WinMain extends Window {
   /**
   * Salva as modificações no projeto.
   *
-  * Salva as modificações nas camadas e também as modificações das configurações.
-  * Este método é utilizado como callback quando o botão 'tbtbSalvar' é pressionado.
   * @see Projeto::salvarProjeto()
+  * @todo Colocar mensagem de projeto salvo com sucesso
   */
-  public function salvarProjeto() { $this->projeto->salvarProjeto(); }
+  public function salvarProjeto() {
+    if ($this->projeto->salvarProjeto()) {
+      // -- Mensagem de salvo com sucesso
+    }
+  }
 
   /**
   * Abre o formulário de configuração do projeto.
@@ -154,11 +161,17 @@ final class WinMain extends Window {
     $this->WinMain->show_all();
   }
 
-  private function atualizarTitulo() {
+  /**
+  * Atualiza o título da janela principal com o caminho do projeto.
+  */
+  //private function atualizarTitulo() {
     // -- Atualiza o título da janela principal
-    $this->WinMain->set_title($this->tituloJanela . ' [' . $this->projeto->pathProjeto . ']');
-  }
+    //$this->WinMain->set_title($this->tituloJanela . ' [' . $this->projeto->pathProjeto . ']');
+  //}
 
+  /**
+  * Atualiza a cor de fundo da área de trabalho e da área do tileset.
+  */
   private function atualizarCorDeFundo() {
     if (!is_null($this->projeto->corDeFundo)) {
       $this->vwpAreaTrabalho->modify_bg(
@@ -168,6 +181,9 @@ final class WinMain extends Window {
     }
   }
 
+  /**
+  * Carrega o conjunto de tiles do projeto e preenche a área de tilesets dos projeto.
+  */
   private function carregarTileset() {
     if (!is_null($this->projeto->pathTileset)) {
       if (!is_null($this->vwpTileset->get_child())) { $this->vwpTileset->remove($this->vwpTileset->get_child()); }
@@ -175,10 +191,7 @@ final class WinMain extends Window {
       list($larguraTileset, $alturaTileset) = getimagesize($this->projeto->pathTileset);
       $tblTiles = new GtkTable(($larguraTileset / $this->projeto->larguraTile),
         ($alturaTileset / $this->projeto->alturaTile));
-      //$tblTiles->set_row_spacings(1);
-      //$tblTiles->set_col_spacings(1);
-      //$tblTiles->set_border_width(1);
-      // -- Carregando tiles
+      // -- Carregando tiles já cortados
       $pathTile = $this->projeto->pathProjeto . DIRECTORY_SEPARATOR . Projeto::PATH_TILES . DIRECTORY_SEPARATOR;
       for ($x = 0; $x < ($larguraTileset / $this->projeto->larguraTile); $x++) {
         for ($y = 0; $y < ($alturaTileset / $this->projeto->alturaTile); $y++) {
