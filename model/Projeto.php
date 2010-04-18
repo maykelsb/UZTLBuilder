@@ -38,22 +38,6 @@
 * @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
 
-    /*switch ($prop) {
-    case 'pathTileset':
-      //$pathOrigemTileset = $valor;
-      //$pathDestinoTileset = $this->pathProjeto . DIRECTORY_SEPARATOR . 'tileset.png';
-      if (($pathOrigemTileset != $pathDestinoTileset) && !empty($pathOrigemTileset)) {
-        if (!copy($pathOrigemTileset, $pathDestinoTileset)) {
-          trigger_error('Falha ao copiar tileset para diretório de trabalho.', E_USER_ERROR);
-        }
-        $this->quebrarTileset();
-        $pathDestinoTileset = $valor;
-      }
-    default: $this->propriedades[$prop] = $valor;
-    }*/
-
-
-
 /**
 * Classe de persistência de projetos.
 *
@@ -246,6 +230,31 @@ final class Projeto {
     foreach($spXML->attributes() as $key => $valor) { $this->$key = (string)$valor; }
     // -- Configurações do projeto
     foreach ($spXML->configuracao[0]->children() as $key => $valor) { $this->$key = (string)$valor; }
+  }
+
+  /**
+  * Copia o tileset do local indicado pelo usuário para o diretório de trabalho do projeto.
+  *
+  * Também chama a função de quebra de tileset.
+  */
+  public function copiarTileset() {
+    $pathDestinoTileset = $this->pathProjeto . DIRECTORY_SEPARATOR . 'tileset.png';
+
+    if (($this->pathTileset != $pathDestinoTileset) && !is_null($this->pathTileset)) {
+      // -- Criando diretório de trabalho, se já não foi criado pelo salvamento do projeto
+      if (!is_dir($this->pathProjeto)) {
+        if (!mkdir($this->pathProjeto)) {
+          trigger_error('Não foi possível criar o diretório de trabalho do projeto.');
+        }
+      }
+      // -- Copiando o arquivo do caminho indicado pelo usuário para o diretório de trabalho do projeto
+      if (!copy($this->pathTileset, $pathDestinoTileset)) {
+        trigger_error('Falha ao copiar tileset para diretório de trabalho.', E_USER_ERROR);
+      }
+      // -- Quebrando o tileset em tiles para exibição na área de tileset
+      $this->quebrarTileset();
+      $this->pathTileset = $pathDestinoTileset;
+    }
   }
 
   /**

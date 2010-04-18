@@ -134,7 +134,7 @@ class DlgConfig extends Dialog {
       $this->projeto->alturaMapa = $this->spbAlturaMapa->get_value_as_int();
       $this->projeto->quantidadeLayers = $this->spbQtdLayers->get_value_as_int();
       $this->projeto->corDeFundo = GtkColorSelection::palette_to_string(
-        array($this->cbCorDeFundo->get_color()));
+                                     array($this->cbCorDeFundo->get_color()));
       $this->projeto->linguagemExport = $this->cbLinguagemExport->get_active_text();
       $this->projeto->pathTileset = $this->fcbCarrTileset->get_filename();
     }

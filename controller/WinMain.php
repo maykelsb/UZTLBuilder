@@ -59,17 +59,15 @@ final class WinMain extends Window {
   /**
   * Define funcionalidades básicas para uma caixa de diálogo de manipulação de arquivo.
   *
-  * @param $tituloCaixaSelecao String Com o título exibido pela caixa de diálogo;
-  * @param $tipoCaixaSelecao action Tipo da caixa de diálogo (Abrir - Gtk::FILE_CHOOSER_ACTION_OPEN, Salvar - Gtk::FILE_CHOOSER_ACTION_SAVE);
-  * @return String com o caminho do arquivo selecionado.
+  * @param string $tituloCaixaSelecao  Com o título exibido pela caixa de diálogo;
+  * @param Action $tipoCaixaSelecao Tipo da caixa de diálogo (Abrir - Gtk::FILE_CHOOSER_ACTION_OPEN, Salvar - Gtk::FILE_CHOOSER_ACTION_SAVE);
+  * @return string com o caminho do arquivo selecionado.
   */
   private function dlgArquivos($tituloCaixaSelecao, $tipoCaixaSelecao) {
     $path = null;
-    $dlg = new GtkFileChooserDialog($tituloCaixaSelecao,
-      null,
-      $tipoCaixaSelecao,
-      array(Gtk::STOCK_OK, Gtk::RESPONSE_OK,
-        Gtk::STOCK_CANCEL, Gtk::RESPONSE_CANCEL));
+    $dlg = new GtkFileChooserDialog($tituloCaixaSelecao, null, $tipoCaixaSelecao,
+                                    array(Gtk::STOCK_OK, Gtk::RESPONSE_OK,
+                                          Gtk::STOCK_CANCEL, Gtk::RESPONSE_CANCEL));
     // -- Caminho padrão de projetos e filtro para tipo de arquivo
     $dlg->set_current_folder(DIR_PROJETOS);
     $dlg->add_filter($this->createFileFilter(Projeto::DESC_TIPO_ARQUIVO_PROJETO,
@@ -132,13 +130,17 @@ final class WinMain extends Window {
   * Abre o formulário de configuração do projeto.
   */
   public function exibirFormConfiguracao() {
-    if (!is_null($this->projeto)) {
-      $dlg = new DlgConfig($this->projeto);
-      $retConfig = $dlg->run();
-      $dlg->destroy();
-      return $retConfig;
+    if (is_null($this->projeto)) {
+      trigger_error('Nenhum projeto aberto para configuração.', E_USER_ERROR);
     }
-    trigger_error('Nenhum projeto aberto para configuração.', E_USER_ERROR);
+    $dlg = new DlgConfig($this->projeto);
+    $retConfig = $dlg->run();
+    if (DlgConfig::BOTAO_OK == $retConfig) {
+      // -- Cópia do tileset para a pasta de trabalho do projeto
+      $this->projeto->copiarTileset();
+      $this->projeto->salvarProjeto();
+    }
+    $dlg->destroy();
   }
 
   /**
