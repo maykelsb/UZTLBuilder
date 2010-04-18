@@ -40,7 +40,6 @@
 
 /**
 * Configurações e funções gerais.
-*
 * @see init.php
 */
 require_once('init.php');

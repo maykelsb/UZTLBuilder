@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.3 on Fri Jan 01 22:13:47 2010 -->
+<!--Generated with glade3 3.4.3 on Sat Apr 17 18:59:21 2010 -->
 <glade-interface>
   <widget class="GtkWindow" id="WinMain">
     <property name="width_request">800</property>
@@ -29,7 +29,7 @@
                 <signal name="clicked" handler="criarProjeto"/>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
@@ -40,28 +40,25 @@
                 <signal name="clicked" handler="abrirProjeto"/>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
               <widget class="GtkToolButton" id="tbtnSalvar">
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="label" translatable="yes">Salvar</property>
                 <property name="stock_id">gtk-save</property>
                 <signal name="clicked" handler="salvarProjeto"/>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
               <widget class="GtkSeparatorToolItem" id="tbtnSeparador1">
                 <property name="visible">True</property>
               </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">False</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkToolButton" id="tbtnLimpar">
@@ -71,28 +68,25 @@
                 <property name="stock_id">gtk-clear</property>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
               <widget class="GtkSeparatorToolItem" id="tbtnSeparador2">
                 <property name="visible">True</property>
               </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">False</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkToolButton" id="tbtnConfigurar">
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="label" translatable="yes">Config</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-preferences</property>
                 <signal name="clicked" handler="exibirFormConfiguracao"/>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
@@ -104,7 +98,7 @@
                 <property name="stock_id">gtk-zoom-fit</property>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
@@ -115,17 +109,13 @@
                 <property name="stock_id">gtk-convert</property>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
               <widget class="GtkSeparatorToolItem" id="tbtnSeparador3">
                 <property name="visible">True</property>
               </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">False</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkToolButton" id="tbtnSobre">
@@ -135,17 +125,13 @@
                 <signal name="clicked" handler="showAbout"/>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
               <widget class="GtkSeparatorToolItem" id="tbtnSeparador4">
                 <property name="visible">True</property>
               </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">False</property>
-              </packing>
             </child>
             <child>
               <widget class="GtkToolButton" id="tbtnSair">
@@ -155,7 +141,7 @@
                 <signal name="clicked" handler="closeWindow"/>
               </widget>
               <packing>
-                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
           </widget>
@@ -206,7 +192,6 @@
                           <widget class="GtkTreeView" id="tvwLayers">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="headers_clickable">True</property>
                           </widget>
                         </child>
                       </widget>
