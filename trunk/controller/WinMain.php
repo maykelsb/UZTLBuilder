@@ -136,6 +136,8 @@ final class WinMain extends Window {
     $dlg = new DlgConfig($this->projeto);
     $retConfig = $dlg->run();
     if (DlgConfig::BOTAO_OK == $retConfig) {
+      // -- Atualização das layers do projeto
+      $this->projeto->atualizarLayers();
       // -- Cópia do tileset para a pasta de trabalho do projeto
       $this->projeto->copiarTileset();
       $this->projeto->salvarProjeto();

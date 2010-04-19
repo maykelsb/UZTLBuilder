@@ -70,11 +70,7 @@ final class Projeto {
   * @const EXTENCAO_ARQUIVO_PROJETO
   */
   const EXTENCAO_ARQUIVO_PROJETO = 'uzp';
-  /**
-  * Extenção utilizada pelos arquivos de layers.
-  * @const EXTENCAO_ARQUIVO_LAYER
-  */
-  const EXTENCAO_ARQUIVO_LAYER = 'uzl';
+
   /**
   * Descrição do tipo de arquivo de projeto.
   * @const DESC_TIPO_ARQUIVO_PROJETO
@@ -292,21 +288,40 @@ final class Projeto {
   }
 
   /**
-  * Cria o conjunto de layers do projeto.
+  * Cria ou atualiza o conjunto de layers do projeto.
   */
-  public function criarLayers() {
-    $this->layers = array_pad(
-      $this->layers,
-      $this->quantidadeLayers,
-      new Layer($this->larguraMapa, $this->alturaMapa));
-
+  public function atualizarLayers() {
+    if (empty($this->layers)) { // -- Cria as novas layers
+      $this->layers = array_pad(
+        $this->layers,
+        $this->quantidadeLayers,
+        new Layer($this->larguraMapa, $this->alturaMapa));
+    } else { // -- Atualiza as layers existentes
+      // -- Removendo layers
+      while (count($this->layers) > $this->quantidadeLayers) {
+        $this->removerLayer();
+      }
+      // -- Aplicando resize nas layers que não foram removidas
+      if (($this->larguraMapa != $this->layers[0]->larguraLayer)
+          || ($this->alturaMapa != $this->layers[0]->alturaLayer)) {
+        foreach ($this->layers as $oLayer) {
+          $oLayer->larguraLayer = $this->larguraMapa;
+          $oLayer->alturaLayer = $this->alturaMapa;
+          $oLayer->ajustarDimensoesLayer();
+        }
+      }
+      // -- Adicionando layers (no tamanho correto)
+      while (count($this->layers) < $this->quantidadeLayers) {
+        $this->adicionarLayer();
+      }
+    }
   }
 
   /**
-  * Adiciona uma nova layer em branco ao projeto.
-  * @param int $pos Posição de inserção da nova camada.
+  * Adiciona uma nova layer em branco ao projeto na posição solicitada.
+  * @param int $pos Posição de inserção da nova camada, se não for informada, é inserida no fim da lista de camadas.
   */
-  public function adicionarLayer($pos = null) {
+  private function adicionarLayer($pos = null) {
     if (array_key_exists($pos, $this->layers)) {
       $tmpArray = array();
       foreach ($this->layers as $key => $item) {
@@ -323,10 +338,11 @@ final class Projeto {
   }
 
   /**
-  * Remove a layer na posição indica e reseta as chaves do array de layers.
-  * @param int $pos Posição da camada a ser removida.
+  * Remove a layer na posição indicada.
+  * @param int $pos Posição da layer a ser removida, se não for informada, é removida a última layer.
   */
-  public function removerLayer($pos) {
+  private function removerLayer($pos = null) {
+    if (is_null($pos)) { $pos = (count($this->layers) - 1); }
     unset($this->layers[$pos]);
     // -- Resetando chaves do array de layers
     $this->layers = array_values($this->layers);
