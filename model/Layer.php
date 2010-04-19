@@ -40,17 +40,23 @@
 
 /**
 * Coleção de linhas de tiles de uma layer.
-* @see ArrayIterator
-* @final
-* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
+*
 * @property int $id ID da classe;
 * @property string $nome Nome da classe se renomeada;
 * @property int $larguraLayer Largura da layer em tiles;
 * @property int $alturaLayer Altura da layer em tiles;
+* @final
+* @see ArrayIterator
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
 */
-final class Layer extends ArrayIterator {
+final class Layer extends ArrayAccessIterator {
 
-  const EXTENCAO_ARQUIVO_LAYER = '.upl';
+  /**
+  * Extenção dos arquivos do conteúdo das layers do projeto.
+  * @const EXTENCAO_ARQUIVO_LAYER
+  */
+  const EXTENCAO_ARQUIVO_LAYER = 'uzl';
+
 
   /**
   * Propriedades da classe de layer.
@@ -63,7 +69,10 @@ final class Layer extends ArrayIterator {
     'alturaLayer' => null);
 
   /**
+  * Validando o tipo de dado que é anexado aos elementos da layer.
   *
+  * @param int $offset Posição para inserção do novo elemento;
+  * @param LayerLinha Novo elemento a ser adicionado ao conjunto de elementos;
   */
   public function offsetSet($offset, $valor) {
     if (get_class($valor) != 'LayerLinha') {
@@ -88,87 +97,133 @@ final class Layer extends ArrayIterator {
   }
 
   /**
+  * Cria uma nova layer em branco com as dimensões especificadas.
   *
+  * @param int $larguraLayer Largula em tiles da camada;
+  * @param int $alturaLayer Altura em tiles da camada;
+  * @see LayerLinha
   */
   public function __construct($larguraLayer, $alturaLayer) {
     $this->larguraLayer = $larguraLayer;
     $this->alturaLayer = $alturaLayer;
     // -- Criando as linhas de cada camada
     for ($y = 0; $y < $this->alturaLayer; $y++) {
-      $this[] = new LayerLinha($larguraLayer);
+      $this->elementos[] = new LayerLinha($larguraLayer);
     }
   }
 
-  /**
-  * @static
-  */
-  public static function carregarLayerXML($pathXMLDaLayer) {
-    if (!($spXML = simplexml_load_file($pathXMLDaLayer))) {
-      trigger_error('Não foi possível carregar as definições da layer.', E_USER_ERROR);
-    }
-    $layer = new Layer(5, 5);
-    // -- Atributos da layer
-    foreach ($spXML->attributes as $key => $valor) { $layer->$key = (string)$valor; }
-    // -- Carregando linhas da layer
-    foreach ($spXML->children() as $key => $valor) {
-      $lnhLayer = new LinhaLayer($larguraLayer);
-      $lnhLayer->carregarLinha($valor);
-      $layer[] = $lnhLayer;
-    }
-    return $layer;
-  }
 
-  public function salvarLayer($path) {
-    $domDoc = new DomDocument('1.0', 'iso-8859-1');
-    $elmRoot = $domDoc->appendChild(new DomElement('layer'));
-    $elmRoot->setAttributeNode(new DOMAttr('id', $this->id));
-    $elmRoot->setAttributeNode(new DOMAttr('nome', $this->nome));
 
-    foreach ($this as $keyRow => $row) {
-      $rowTile = $elmRoot->appendChild(new DomElement('row'));
-      foreach ($row as $keyCol => $col) {
-        $colTile = $rowTile->appendChild(new DomElement('col', (string)$col));
-      }
-    }
 
-    // -- Salvando arquivo de conteúdo da layer
-    $pathLayer = $path . sprintf("%02d", $this->id) . self::EXTENCAO_ARQUIVO_LAYER;
-    
-    var_dump($pathLayer);
-    
-    if (false !== file_put_contents($pathLayer, $domDoc->saveXML())) {
-      trigger_error('Não foi possível salvar definições de layer', E_USER_ERROR);
-    }
-  }
 
-  private function ajustarDimensoesLayer() {
-    $larguraAtual = count($this[0]);
-    $alturaAtual = count($this);
 
-    // -- A ordenação dos ajustes visa uma melhor performance, sem desperdiçar ações
-    if ($this->alturaLayer < $alturaAtual) {
-      // -- Remove linhas do final
-      $this->elementos = array_slice($this->elementos, 0, $this->alturaLayer);
-    }
-    if ($this->larguraLayer < $larguraAtual) {
-      // -- Remove colunas do final de todas as linhas
-      foreach ($this as &$linha) {
-        $linha->diminuirLargura($this->larguraLayer, $larguraAtual);
-      }
-    }
-    if ($this->larguraLayer > $larguraAtual) {
-      // -- Adiciona colunas no final de todas as linhas
-      foreach ($this as &$linha) {
-        $linha->aumentarLargura($this->larguraLayer, $larguraAtual);
-      }
-    }
-    if ($this->alturaLayer > $alturaAtual) {
-      // -- Adiciona novas linhas no final da layer já com o tamanho correto
-      $this->elementos = array_pad(
-        $this->elementos,
-        $this->alturaLayer,
-        new LayerLinha($this->larguraLayer));
-    }
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+#
+#final class Layer extends ArrayIterator {
+#
+
+#
+
+#
+#  /**
+#  *
+#  */
+
+#
+
+#
+
+#
+#  /**
+#  * @static
+#  */
+#  public static function carregarLayerXML($pathXMLDaLayer) {
+#    if (!($spXML = simplexml_load_file($pathXMLDaLayer))) {
+#      trigger_error('Não foi possível carregar as definições da layer.', E_USER_ERROR);
+#    }
+#    $layer = new Layer(5, 5);
+#    // -- Atributos da layer
+#    foreach ($spXML->attributes as $key => $valor) { $layer->$key = (string)$valor; }
+#    // -- Carregando linhas da layer
+#    foreach ($spXML->children() as $key => $valor) {
+#      $lnhLayer = new LinhaLayer($larguraLayer);
+#      $lnhLayer->carregarLinha($valor);
+#      $layer[] = $lnhLayer;
+#    }
+#    return $layer;
+#  }
+#
+#  public function salvarLayer($path) {
+#    $domDoc = new DomDocument('1.0', 'iso-8859-1');
+#    $elmRoot = $domDoc->appendChild(new DomElement('layer'));
+#    $elmRoot->setAttributeNode(new DOMAttr('id', $this->id));
+#    $elmRoot->setAttributeNode(new DOMAttr('nome', $this->nome));
+#
+#    foreach ($this as $keyRow => $row) {
+#      $rowTile = $elmRoot->appendChild(new DomElement('row'));
+#      foreach ($row as $keyCol => $col) {
+#        $colTile = $rowTile->appendChild(new DomElement('col', (string)$col));
+#      }
+#    }
+#
+#    // -- Salvando arquivo de conteúdo da layer
+#    $pathLayer = $path . DIRECTORY_SEPARATOR . sprintf("%02d", $this->id) . self::EXTENCAO_ARQUIVO_LAYER;
+#    if (false === file_put_contents($pathLayer, $domDoc->saveXML())) {
+#      trigger_error('Não foi possível salvar definições de layer', E_USER_ERROR);
+#    }
+#  }
+#
+#  public function ajustarDimensoesLayer() {
+#    $larguraAtual = count($this[0]);
+#    $alturaAtual = count($this);
+#
+#    // -- A ordenação dos ajustes visa uma melhor performance, sem desperdiçar ações
+#    if ($this->alturaLayer < $alturaAtual) {
+#      // -- Remove linhas do final
+#      $this = array_slice($this, 0, $this->alturaLayer);
+#    }
+#    if ($this->larguraLayer < $larguraAtual) {
+#      // -- Remove colunas do final de todas as linhas
+#      foreach ($this as &$linha) {
+#        $linha->diminuirLargura($this->larguraLayer, $larguraAtual);
+#      }
+#    }
+#    if ($this->larguraLayer > $larguraAtual) {
+#      // -- Adiciona colunas no final de todas as linhas
+#      foreach ($this as &$linha) {
+#        $linha->aumentarLargura($this->larguraLayer, $larguraAtual);
+#      }
+#    }
+#    if ($this->alturaLayer > $alturaAtual) {
+#      // -- Adiciona novas linhas no final da layer já com o tamanho correto
+#      $this = array_pad($this, $this->alturaLayer, new LayerLinha($this->larguraLayer));
+#    }
+#  }
+#}
 ?>
