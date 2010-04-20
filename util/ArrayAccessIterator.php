@@ -45,7 +45,15 @@
 * @see LayerLinha
 */
 class ArrayAccessIterator implements ArrayAccess, Iterator {
+  /**
+  * Indicação da posição atual do array de elementos.
+  * @var int
+  */
   protected $posicao = 0;
+  /**
+  * Armazena os elementos da classe.
+  * @var array
+  */
   protected $elementos = array();
 
   // -- Iterator

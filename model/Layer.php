@@ -46,8 +46,7 @@
 * @property int $larguraLayer Largura da layer em tiles;
 * @property int $alturaLayer Altura da layer em tiles;
 * @final
-* @see ArrayIterator
-* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
+* @see ArrayAccessIterator
 */
 final class Layer extends ArrayAccessIterator {
 
@@ -112,30 +111,52 @@ final class Layer extends ArrayAccessIterator {
     }
   }
 
+  public function salvarLayer($path) {
+    $domDoc = new DomDocument('1.0', 'iso-8859-1');
+    $elmRoot = $domDoc->appendChild(new DomElement('layer'));
+    $elmRoot->setAttributeNode(new DOMAttr('id', $this->id));
+    $elmRoot->setAttributeNode(new DOMAttr('nome', $this->nome));
 
+    foreach ($this->elementos as $keyRow => $row) {
+      $rowTile = $elmRoot->appendChild(new DomElement('row'));
+      foreach ($row as $keyCol => $col) {
+        $colTile = $rowTile->appendChild(new DomElement('col', (string)$col));
+      }
+    }
 
+    // -- Salvando arquivo de conteúdo da layer
+    $pathLayer = $path . DIRECTORY_SEPARATOR . sprintf("%02d", $this->id) . self::EXTENCAO_ARQUIVO_LAYER;
+    if (false === file_put_contents($pathLayer, $domDoc->saveXML())) {
+      trigger_error('Não foi possível salvar definições de layer', E_USER_ERROR);
+    }
+  }
 
+  public function ajustarDimensoesLayer() {
+    $larguraAtual = count($this->elementos[0]);
+    $alturaAtual = count($this->elementos);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // -- A ordenação dos ajustes visa uma melhor performance, sem desperdiçar ações
+    if ($this->alturaLayer < $alturaAtual) {
+      // -- Remove linhas do final
+      $this = array_slice($this, 0, $this->alturaLayer);
+    }
+    if ($this->larguraLayer < $larguraAtual) {
+      // -- Remove colunas do final de todas as linhas
+      foreach ($this as &$linha) {
+        $linha->diminuirLargura($this->larguraLayer, $larguraAtual);
+      }
+    }
+    if ($this->larguraLayer > $larguraAtual) {
+      // -- Adiciona colunas no final de todas as linhas
+      foreach ($this as &$linha) {
+        $linha->aumentarLargura($this->larguraLayer, $larguraAtual);
+      }
+    }
+    if ($this->alturaLayer > $alturaAtual) {
+      // -- Adiciona novas linhas no final da layer já com o tamanho correto
+      $this = array_pad($this, $this->alturaLayer, new LayerLinha($this->larguraLayer));
+    }
+  }
 }
 
 
@@ -143,23 +164,6 @@ final class Layer extends ArrayAccessIterator {
 
 
 
-
-#
-#final class Layer extends ArrayIterator {
-#
-
-#
-
-#
-#  /**
-#  *
-#  */
-
-#
-
-#
-
-#
 #  /**
 #  * @static
 #  */
@@ -178,52 +182,4 @@ final class Layer extends ArrayAccessIterator {
 #    }
 #    return $layer;
 #  }
-#
-#  public function salvarLayer($path) {
-#    $domDoc = new DomDocument('1.0', 'iso-8859-1');
-#    $elmRoot = $domDoc->appendChild(new DomElement('layer'));
-#    $elmRoot->setAttributeNode(new DOMAttr('id', $this->id));
-#    $elmRoot->setAttributeNode(new DOMAttr('nome', $this->nome));
-#
-#    foreach ($this as $keyRow => $row) {
-#      $rowTile = $elmRoot->appendChild(new DomElement('row'));
-#      foreach ($row as $keyCol => $col) {
-#        $colTile = $rowTile->appendChild(new DomElement('col', (string)$col));
-#      }
-#    }
-#
-#    // -- Salvando arquivo de conteúdo da layer
-#    $pathLayer = $path . DIRECTORY_SEPARATOR . sprintf("%02d", $this->id) . self::EXTENCAO_ARQUIVO_LAYER;
-#    if (false === file_put_contents($pathLayer, $domDoc->saveXML())) {
-#      trigger_error('Não foi possível salvar definições de layer', E_USER_ERROR);
-#    }
-#  }
-#
-#  public function ajustarDimensoesLayer() {
-#    $larguraAtual = count($this[0]);
-#    $alturaAtual = count($this);
-#
-#    // -- A ordenação dos ajustes visa uma melhor performance, sem desperdiçar ações
-#    if ($this->alturaLayer < $alturaAtual) {
-#      // -- Remove linhas do final
-#      $this = array_slice($this, 0, $this->alturaLayer);
-#    }
-#    if ($this->larguraLayer < $larguraAtual) {
-#      // -- Remove colunas do final de todas as linhas
-#      foreach ($this as &$linha) {
-#        $linha->diminuirLargura($this->larguraLayer, $larguraAtual);
-#      }
-#    }
-#    if ($this->larguraLayer > $larguraAtual) {
-#      // -- Adiciona colunas no final de todas as linhas
-#      foreach ($this as &$linha) {
-#        $linha->aumentarLargura($this->larguraLayer, $larguraAtual);
-#      }
-#    }
-#    if ($this->alturaLayer > $alturaAtual) {
-#      // -- Adiciona novas linhas no final da layer já com o tamanho correto
-#      $this = array_pad($this, $this->alturaLayer, new LayerLinha($this->larguraLayer));
-#    }
-#  }
-#}
 ?>
