@@ -61,7 +61,7 @@ class ArrayAccessIterator implements ArrayAccess, Iterator {
   public function key() { return $this->posicao; }
   public function next() { ++$this->posicao; }
   public function rewind() { $this->posicao = 0; }
-  public function valid() { return isset($this->elementos[$this->posicao]); }
+  public function valid() { return array_key_exists($this->posicao, $this->elementos); }
 
   // -- ArrayAccess
   public function offsetExists($offset) { return isset($this->elementos[$offset]); }
