@@ -39,17 +39,35 @@
 */
 
 /**
+* Esta classe representa uma linha de uma camada.
 *
+* @see Layer
+* @see ArrayAccessIterator
 */
 final class LayerLinha extends ArrayAccessIterator {
+  /**
+  * Constrói uma linha de camada do tamanho requisitado.
+  *
+  * @param int $larguraLinha Quantidade de tiles que irá compor uma linha de camada.
+  */
   public function __construct($larguraLinha) {
     $this->elementos = array_pad(array(), $larguraLinha, null);
   }
 
+  /**
+  * Aumenta a quantidade de tiles que compõe uma linha de camada.
+  *
+  * @param int $novaLargura A nova largura que a linha de camada deverá ter.
+  */
   public function aumentarLargura($novaLargura) {
     $this->elementos = array_pad($this->elementos, $novaLargura, null);
   }
 
+  /**
+  * Diminui a quantidade de tiles que compõe uma linha de camada.
+  *
+  * @param int $novaLargura A nova largura que a linha de camada deverá ter.
+  */
   public function diminuirLargura($novaLargura) {
     $this->elementos = array_slice($this->elementos, 0, $novaLargura);
   }
