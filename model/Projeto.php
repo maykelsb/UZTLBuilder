@@ -205,8 +205,14 @@ final class Projeto {
         trigger_error('Não foi possível criar o diretório de trabalho do projeto.');
       }
     }
+
+    // -- Apagando os arquivos de camadas (pro caso de alguma ter sido removida)
+    foreach (glob($this->pathProjeto . DIRECTORY_SEPARATOR . "*." . Layer::EXTENCAO_ARQUIVO_LAYER) as $pathLayer) {
+      unlink($pathLayer);
+    }
+
     // -- Salvando o XML das layers
-    foreach ($this->layers as $oLayer) { $oLayer->salvarLayer($this->pathProjeto); }
+    foreach ($this->layers as $iKey => $oLayer) { $oLayer->salvarLayer($this->pathProjeto, $iKey); }
     return true;
   }
 
@@ -292,10 +298,7 @@ final class Projeto {
   */
   public function atualizarLayers() {
     if (empty($this->layers)) { // -- Cria as novas layers
-      $this->layers = array_pad(
-        $this->layers,
-        $this->quantidadeLayers,
-        new Layer($this->larguraMapa, $this->alturaMapa));
+      $this->layers = array_pad(array(), $this->quantidadeLayers, new Layer($this->larguraMapa, $this->alturaMapa));
     } else { // -- Atualiza as layers existentes
       // -- Removendo layers
       while (count($this->layers) > $this->quantidadeLayers) {
@@ -328,12 +331,12 @@ final class Projeto {
         if ($key < $pos) { $tmpArray[$key] = $item; } // -- Itens anteriores ao novo
         else if ($key > $pos) { $tmpArray[$key + 1] = $item; } // -- Itens posteriores ao novo
         else { // -- Posição de inserção
-          $tmpArray[$key] = Layer::novaLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
+          $tmpArray[$key] = New Layer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
         }
       }
       $this->layers = $tmpArray;
     } else { // -- Posição não existe ou é nula
-      $this->layers[] = Layer::novaLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
+      $this->layers[] = new Layer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
     }
   }
 
@@ -346,16 +349,6 @@ final class Projeto {
     unset($this->layers[$pos]);
     // -- Resetando chaves do array de layers
     $this->layers = array_values($this->layers);
-  }
-
-  /**
-  * Salva as layers do projeto.
-  * @see Layer
-  */
-  public function salvarLayers() {
-    foreach ($this->layers as $layer) {
-      $layer->salvarLayer($this->pathProjeto);
-    }
   }
 
   /**
