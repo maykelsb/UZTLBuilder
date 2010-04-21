@@ -66,7 +66,12 @@ class ArrayAccessIterator implements ArrayAccess, Iterator {
   // -- ArrayAccess
   public function offsetExists($offset) { return isset($this->elementos[$offset]); }
   public function offsetGet($offset) { return $this->elementos[$offset]; }
-  public function offsetSet($offset, $valor) { $this->elementos[$offset] = $valor; }
+  public function offsetSet($offset, $valor) {
+    if (is_null($offset)) {
+      $offset = count($this->elementos);
+      $this->elementos[$offset] = $valor;
+    }
+  }
   public function offsetUnset($offset) { unset($this->elementos[$offset]); }
 }
 ?>

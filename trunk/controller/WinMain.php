@@ -156,7 +156,7 @@ final class WinMain extends Window {
   * </li></ul>
   */
   public function atualizarFormulario() {
-    $this->atualizarTitulo();
+    $this->WinMain->set_title("{$this->tituloJanela} [{$nomeProjeto}]");
     $this->atualizarCorDeFundo();
     $this->carregarTileset();
     $this->carregarListaLayers();
@@ -189,7 +189,7 @@ final class WinMain extends Window {
   * Carrega o conjunto de tiles do projeto e preenche a área de tilesets dos projeto.
   */
   private function carregarTileset() {
-    if (!is_null($this->projeto->pathTileset)) {
+    if (!empty($this->projeto->pathTileset)) {
       if (!is_null($this->vwpTileset->get_child())) { $this->vwpTileset->remove($this->vwpTileset->get_child()); }
       // -- Construindo tabela de tiles
       list($larguraTileset, $alturaTileset) = getimagesize($this->projeto->pathTileset);
