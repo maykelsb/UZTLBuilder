@@ -111,7 +111,8 @@ final class Layer extends ArrayAccessIterator {
     }
   }
 
-  public function salvarLayer($path) {
+  public function salvarLayer($path, $id) {
+    $this->id = $id;
     $domDoc = new DomDocument('1.0', 'iso-8859-1');
     $elmRoot = $domDoc->appendChild(new DomElement('layer'));
     $elmRoot->setAttributeNode(new DOMAttr('id', $this->id));
@@ -120,11 +121,6 @@ final class Layer extends ArrayAccessIterator {
     foreach ($this as $rowKey => $row) {
       $rowTile = $elmRoot->appendChild(new DomElement('row'));
       foreach ($row as $col) { $colTile = $rowTile->appendChild(new DomElement('col', $col)); }
-    }
-
-    // -- Apagando os arquivos de camadas (pro caso de alguma ter sido removida)
-    foreach (glob($path . DIRECTORY_SEPARATOR . "*." . self::EXTENCAO_ARQUIVO_LAYER) as $pathLayer) {
-      unlink($pathLayer);
     }
 
     // -- Salvando arquivo de conteúdo da layer
