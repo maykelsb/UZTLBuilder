@@ -50,7 +50,7 @@ final class LayerLinha extends ArrayAccessIterator {
   *
   * @param int $larguraLinha Quantidade de tiles que irá compor uma linha de camada.
   */
-  public function __construct($larguraLinha) {
+  public function __construct($larguraLinha = 0) {
     $this->elementos = array_pad(array(), $larguraLinha, null);
   }
 
@@ -70,6 +70,15 @@ final class LayerLinha extends ArrayAccessIterator {
   */
   public function diminuirLargura($novaLargura) {
     $this->elementos = array_slice($this->elementos, 0, $novaLargura);
+  }
+
+  /**
+  * Carrega os valores de uma linha de camada.
+  *
+  * @param object $oValores Os valores de tilesets para a linha.
+  */
+  public function carregarLinha($oValores) {
+    foreach ($oValores as $mValor) { $this->elementos[] = (string)$mValor; }
   }
 }
 ?>

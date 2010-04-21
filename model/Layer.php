@@ -56,7 +56,6 @@ final class Layer extends ArrayAccessIterator {
   */
   const EXTENCAO_ARQUIVO_LAYER = 'uzl';
 
-
   /**
   * Propriedades da classe de layer.
   * @var array
@@ -96,19 +95,40 @@ final class Layer extends ArrayAccessIterator {
   }
 
   /**
+  * A instanciação do objeto dá-se utilizando uma das chamadas estáticas a self::criarLayer ou self::carregaLayer.
+  *
+  * @see Layer::criarLayer
+  * @see Layer::carregarLayer
+  */
+  private function __construct() { }
+
+  /**
   * Cria uma nova layer em branco com as dimensões especificadas.
   *
   * @param int $larguraLayer Largula em tiles da camada;
   * @param int $alturaLayer Altura em tiles da camada;
   * @see LayerLinha
   */
-  public function __construct($larguraLayer, $alturaLayer) {
-    $this->larguraLayer = $larguraLayer;
-    $this->alturaLayer = $alturaLayer;
-    // -- Criando as linhas de cada camada
-    for ($y = 0; $y < $this->alturaLayer; $y++) {
-      $this->elementos[] = new LayerLinha($larguraLayer);
+  public static function criarLayer($larguraLayer, $alturaLayer) {
+    $instance = new Layer();
+    $instance->larguraLayer = $larguraLayer;
+    $instance->alturaLayer = $alturaLayer;
+    $instance->elementos
+      = array_pad(array(), $instance->alturaLayer, new LayerLinha($larguraLayer));
+    return $instance;
+  }
+
+  public static function carregarLayer($pathXML) {
+    if (!($oSpXML = simplexml_load_file($pathXML))) {
+      trigger_error('Não foi possível carregar as definições da layer.', E_USER_ERROR);
     }
+    $instance = new Layer();
+    foreach ($oSpXML->children() as $key => $mValor) {
+      $oLayLinha = new LayerLinha();
+      $oLayLinha->carregarLinha($mValor);
+      $instance->elementos[] = $oLayLinha;
+    }
+    return $instance;
   }
 
   public function salvarLayer($path, $id) {
@@ -157,28 +177,4 @@ final class Layer extends ArrayAccessIterator {
     }
   }
 }
-
-
-
-
-
-
-#  /**
-#  * @static
-#  */
-#  public static function carregarLayerXML($pathXMLDaLayer) {
-#    if (!($spXML = simplexml_load_file($pathXMLDaLayer))) {
-#      trigger_error('Não foi possível carregar as definições da layer.', E_USER_ERROR);
-#    }
-#    $layer = new Layer(5, 5);
-#    // -- Atributos da layer
-#    foreach ($spXML->attributes as $key => $valor) { $layer->$key = (string)$valor; }
-#    // -- Carregando linhas da layer
-#    foreach ($spXML->children() as $key => $valor) {
-#      $lnhLayer = new LinhaLayer($larguraLayer);
-#      $lnhLayer->carregarLinha($valor);
-#      $layer[] = $lnhLayer;
-#    }
-#    return $layer;
-#  }
 ?>

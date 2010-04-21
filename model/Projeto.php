@@ -177,6 +177,7 @@ final class Projeto {
     if (!is_file($path)) { trigger_error('Não foi possível abrir o projeto.', E_USER_ERROR); }
     self::$projeto = new Projeto();
     self::$projeto->carregarXML($path);
+    self::$projeto->carregarLayers();
     return self::$projeto;
   }
 
@@ -224,7 +225,7 @@ final class Projeto {
   * @param string $path Path onde está salvo o xml de configuração (com a extenção do projeto).
   * @see Projeto::EXTENCAO_ARQUIVO_PROJETO
   */
-  public function carregarXML($path) {
+  private function carregarXML($path) {
     if (!($spXML = simplexml_load_file($path))) {
       trigger_error('Não foi possível carregar definições do projeto.', E_USER_ERROR);
     }
@@ -232,6 +233,19 @@ final class Projeto {
     foreach($spXML->attributes() as $key => $valor) { $this->$key = (string)$valor; }
     // -- Configurações do projeto
     foreach ($spXML->configuracao[0]->children() as $key => $valor) { $this->$key = (string)$valor; }
+  }
+
+  /**
+  * Carrega as layers salvas no diretório do projeto.
+  * @see Layer
+  */
+  private function carregarLayers() {
+    $fltLayers = $this->pathProjeto . DIRECTORY_SEPARATOR . '*.' . Layer::EXTENCAO_ARQUIVO_LAYER;
+    $arrLayers = glob($fltLayers);
+    sort($arrLayers);
+    foreach ($arrLayers as $XMLLayer) {
+      $this->layers[] = Layer::carregarLayer($XMLLayer);
+    }
   }
 
   /**
@@ -298,7 +312,7 @@ final class Projeto {
   */
   public function atualizarLayers() {
     if (empty($this->layers)) { // -- Cria as novas layers
-      $this->layers = array_pad(array(), $this->quantidadeLayers, new Layer($this->larguraMapa, $this->alturaMapa));
+      $this->layers = array_pad(array(), $this->quantidadeLayers, Layer::criarLayer($this->larguraMapa, $this->alturaMapa));
     } else { // -- Atualiza as layers existentes
       // -- Removendo layers
       while (count($this->layers) > $this->quantidadeLayers) {
@@ -331,12 +345,12 @@ final class Projeto {
         if ($key < $pos) { $tmpArray[$key] = $item; } // -- Itens anteriores ao novo
         else if ($key > $pos) { $tmpArray[$key + 1] = $item; } // -- Itens posteriores ao novo
         else { // -- Posição de inserção
-          $tmpArray[$key] = New Layer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
+          $tmpArray[$key] = Layer::criarLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
         }
       }
       $this->layers = $tmpArray;
     } else { // -- Posição não existe ou é nula
-      $this->layers[] = new Layer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
+      $this->layers[] = Layer::criarLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
     }
   }
 
@@ -349,17 +363,6 @@ final class Projeto {
     unset($this->layers[$pos]);
     // -- Resetando chaves do array de layers
     $this->layers = array_values($this->layers);
-  }
-
-  /**
-  * Carrega as layers salvas no diretório do projeto.
-  * @see Layer
-  */
-  public function carregarLayers() {
-    $fltLayers = $this->projeto->pathProjeto . DIRECTORY_SEPARATOR . '*.' . self::EXTENCAO_ARQUIVO_LAYER;
-    foreach (sort(glob($fltLayers)) as $XMLLayer) {
-      $this->layers[] = Layer::carregarLayerXML($XMLLayer);
-    }
   }
 }
 ?>
