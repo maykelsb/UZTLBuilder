@@ -39,31 +39,19 @@
 */
 
 /**
-* Esta armazena as tiles da linha da camada.
+* Dialog de exportação das fases construídas.
 *
-* @see Layer
-* @see ArrayAccessIterator
+* @see Dialog
 */
-final class LayerLinha extends ArrayAccessIterator {
+class DlgExport extends Dialog {
+  private $projeto;
 
-  // -- Construtor
-  public function __construct($largura = 0) {
-    $this->elementos = array_pad(array(), $largura, null);
+  public function __construct(Projeto $prj) {
+    parent::__construct();
+    $this->projeto = $prj;;
   }
 
-  // -- Métodos de manutenção
-  public function carregarLinha($oValores) {
-    foreach ($oValores as $mValor) { $this[] = (string)$mValor; }
-  }
-
-  // -- ArrayAccess
-  public function offsetGet($offset) {
-    return $this->elementos[$offset];
-  }
-
-  public function offsetSet($offset, $value) {
-    if (is_null($offset)) { $this->elementos[] = $value;
-    } else { $this->elementos[$offset] = $value; }
+  private function montarMockUp() {
   }
 }
 ?>
