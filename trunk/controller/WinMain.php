@@ -126,6 +126,7 @@ final class WinMain extends Window {
   * @todo Colocar mensagem de projeto salvo com sucesso
   */
   public function salvarProjeto() {
+    $this->atualizarLayers();
     if ($this->projeto->salvarProjeto()) {
       // -- Mensagem de salvo com sucesso
     }
@@ -150,6 +151,32 @@ final class WinMain extends Window {
       $this->atualizarFormulario();
     }
     $dlg->destroy();
+  }
+
+  public function exibirFormExportar() {
+    // -- Copiar conteúdo para a layer em memória
+    $this->atualizarLayers();
+    $dlg = new DlgExport($this->projeto);
+    $dlg->run();
+    $dlg->destroy();
+  }
+
+  /**
+  * Copia as referências dos tiles posicionados nas camadas para as layers no projeto.
+  */
+  private function atualizarLayers() {
+    // -- Referência para o conteúdo das layers na GUI
+    $arrLayers = $this->fxdAreaTrabalho->get_children();
+    foreach ($this->projeto->layers as $iKey => &$layer) {
+      $arrTiles = array_reverse($arrLayers[$iKey]->get_children());
+      for ($y = 0; $y < $this->projeto->alturaMapa; $y++) {
+        for ($x = 0; $x < $this->projeto->larguraMapa; $x++) {
+          $tile = $arrTiles[($this->projeto->larguraMapa * $y) + $x]->get_child()->get_child();
+          if (is_null($tile)) { $layer[$y][$x] = null;
+          } else { $layer[$y][$x] = $tile->get_name(); }
+        }
+      }
+    }
   }
 
   /**
@@ -279,6 +306,12 @@ final class WinMain extends Window {
       foreach ($this->fxdAreaTrabalho->get_children() as $child) {
         $this->fxdAreaTrabalho->remove($child);
       }
+      // -- Caminho dos tiles
+      $pathTile = $this->projeto->pathProjeto
+                . DIRECTORY_SEPARATOR
+                . Projeto::PATH_TILES
+                . DIRECTORY_SEPARATOR;
+
       // -- Criando as layers do projeto
       foreach ($this->projeto->layers as $layer) {
         // -- Criando a tabela de tiles da layer com tamanho suficiente para o frame que abrigará o tile
@@ -299,7 +332,6 @@ final class WinMain extends Window {
             $frmTile->add($evb);
 
             if ('' != $tile) { // -- Adicionando um tile previamente selecionado
-              var_dump("{$pathTile}{$tile}.png");
               $imgTile = GtkImage::new_from_file("{$pathTile}{$tile}.png");
               $imgTile->set_name($tile);
               $evb->add($imgTile);
@@ -312,10 +344,6 @@ final class WinMain extends Window {
         $this->fxdAreaTrabalho->put($tblLayer, 0, 0);
       }
     }
-  }
-
-  private function dumpLayers() {
-    
   }
 }
 ?>

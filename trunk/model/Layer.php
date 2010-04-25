@@ -39,16 +39,15 @@
 */
 
 /**
-* Coleção de linhas de tiles de uma layer.
+* Implementa uma coleção de linhas de tiles que compõem uma layer.
 *
-* @property int $id ID da classe;
-* @property string $nome Nome da classe se renomeada;
 * @property int $larguraLayer Largura da layer em tiles;
 * @property int $alturaLayer Altura da layer em tiles;
 * @final
 * @see ArrayAccessIterator
+* @see LayerLinha
 */
-final class Layer extends ArrayAccessIterator {
+class Layer extends ArrayAccessIterator {
 
   /**
   * Extenção dos arquivos do conteúdo das layers do projeto.
@@ -56,81 +55,73 @@ final class Layer extends ArrayAccessIterator {
   */
   const EXTENCAO_ARQUIVO_LAYER = 'uzl';
 
-  /**
-  * Propriedades da classe de layer.
-  * @var array
-  */
-  private $propriedades = array(
-    'id' => null,
-    'nome' => null,
-    'larguraLayer' => null,
-    'alturaLayer' => null);
+  private $larguraLayer;
+  private $alturaLayer;
+  private $id;
+  private $nome;
 
-  /**
-  * Validando o tipo de dado que é anexado aos elementos da layer.
-  *
-  * @param int $offset Posição para inserção do novo elemento;
-  * @param LayerLinha Novo elemento a ser adicionado ao conjunto de elementos;
-  */
-  public function offsetSet($offset, $valor) {
-    if (get_class($valor) != 'LayerLinha') {
-      trigger_error('Tipo de elemento inválido. O novo valor deve ser uma instância de \'LinhaLayer\'.', E_USER_ERROR);
-    }
-    parent::offsetSet($offset, $valor);
+  // -- Getters and Setters
+  public function setDimensoes($altura, $largura) {
+    $this->alturaLayer = $altura;
+    $this->larguraLayer = $largura;
   }
 
-  public function __get($prop) {
-    if (array_key_exists($prop, $this->propriedades)) {
-      return $this->propriedades[$prop];
-    }
-    trigger_error("Propriedade ({$prop}) da layer não definida!", E_USER_ERROR);
+  public function getDimensoes() {
+    return array($this->alturaLayer, $this->larguraLayer);
   }
 
-  public function __set($prop, $valor) {
-    if (array_key_exists($prop, $this->propriedades)) {
-      $this->propriedades[$prop] = $valor;
-      return;
-    }
-    trigger_error("Propriedade ({$prop}) da layer não definida!", E_USER_ERROR);
-  }
+  // -- Construtores
+  private function __construct() {}
 
-  /**
-  * A instanciação do objeto dá-se utilizando uma das chamadas estáticas a self::criarLayer ou self::carregaLayer.
-  *
-  * @see Layer::criarLayer
-  * @see Layer::carregarLayer
-  */
-  private function __construct() { }
-
-  /**
-  * Cria uma nova layer em branco com as dimensões especificadas.
-  *
-  * @param int $larguraLayer Largula em tiles da camada;
-  * @param int $alturaLayer Altura em tiles da camada;
-  * @see LayerLinha
-  */
-  public static function criarLayer($larguraLayer, $alturaLayer) {
-    $instance = new Layer();
-    $instance->larguraLayer = $larguraLayer;
-    $instance->alturaLayer = $alturaLayer;
-    $instance->elementos
-      = array_pad(array(), $instance->alturaLayer, new LayerLinha($larguraLayer));
-    return $instance;
+  public static function criarLayer($altura, $largura) {
+    $layer = new Layer();
+    $layer->setDimensoes($altura, $largura);
+    while($altura--) { $layer[] = new LayerLinha($largura); }
+    return $layer;
   }
 
   public static function carregarLayer($pathXML) {
     if (!($oSpXML = simplexml_load_file($pathXML))) {
       trigger_error('Não foi possível carregar as definições da layer.', E_USER_ERROR);
     }
-    $instance = new Layer();
+    $layer = new Layer();
     foreach ($oSpXML->children() as $key => $mValor) {
-      $oLayLinha = new LayerLinha();
-      $oLayLinha->carregarLinha($mValor);
-      $instance->elementos[] = $oLayLinha;
+      $layerlinha = new LayerLinha();
+      $layerlinha->carregarLinha($mValor);
+      $layer[] = $layerlinha;
     }
-    return $instance;
+    return $layer;
   }
 
+  // -- Métodos de manutenção
+  public function ajustarDimensoesLayer() {
+    $larguraAtual = count($this->elementos[0]);
+    $alturaAtual = count($this->elementos);
+
+    // -- A ordenação dos ajustes visa uma melhor performance, sem desperdiçar ações
+    if ($this->alturaLayer < $alturaAtual) { // -- Remove linhas do final
+      $this->array_slice($this->alturaLayer);
+    }
+    if ($this->larguraLayer < $larguraAtual) {
+      // -- Remove colunas do final de todas as linhas
+      foreach ($this->elementos as &$linha) {
+        $linha->array_slice($this->larguraLayer);
+      }
+    }
+    if ($this->larguraLayer > $larguraAtual) {
+      // -- Adiciona colunas no final de todas as linhas
+      foreach ($this->elementos as &$linha) {
+        $linha->array_pad($this->larguraLayer);
+      }
+    }
+    if ($this->alturaLayer > $alturaAtual) {
+      // -- Adiciona novas linhas no final da layer já com o tamanho correto
+      $this->array_pad($this->alturaLayer, array('class' => 'LayerLinha',
+                                                 'param' => $this->larguraLayer));
+    }
+  }
+
+  // -- Método de persistência
   public function salvarLayer($path, $id) {
     $this->id = $id;
     $domDoc = new DomDocument('1.0', 'iso-8859-1');
@@ -140,7 +131,9 @@ final class Layer extends ArrayAccessIterator {
 
     foreach ($this as $rowKey => $row) {
       $rowTile = $elmRoot->appendChild(new DomElement('row'));
-      foreach ($row as $col) { $colTile = $rowTile->appendChild(new DomElement('col', $col)); }
+      foreach ($row as $col) {
+        $colTile = $rowTile->appendChild(new DomElement('col', $col));
+      }
     }
 
     // -- Salvando arquivo de conteúdo da layer
@@ -150,30 +143,16 @@ final class Layer extends ArrayAccessIterator {
     }
   }
 
-  public function ajustarDimensoesLayer() {
-    $larguraAtual = count($this->elementos[0]);
-    $alturaAtual = count($this->elementos);
+  // -- ArrayIterator
+  public function offsetGet($offset) {
+    if (isset($offset)) { return $this->elementos[$offset]; }
+    return $this->elementos[count($this->elementos) - 1];
+  }
 
-    // -- A ordenação dos ajustes visa uma melhor performance, sem desperdiçar ações
-    if ($this->alturaLayer < $alturaAtual) {
-      // -- Remove linhas do final
-      $this->elementos = array_slice($this->elementos, 0, $this->alturaLayer);
-    }
-    if ($this->larguraLayer < $larguraAtual) {
-      // -- Remove colunas do final de todas as linhas
-      foreach ($this->elementos as &$linha) {
-        $linha->diminuirLargura($this->larguraLayer, $larguraAtual);
-      }
-    }
-    if ($this->larguraLayer > $larguraAtual) {
-      // -- Adiciona colunas no final de todas as linhas
-      foreach ($this->elementos as &$linha) {
-        $linha->aumentarLargura($this->larguraLayer, $larguraAtual);
-      }
-    }
-    if ($this->alturaLayer > $alturaAtual) {
-      // -- Adiciona novas linhas no final da layer já com o tamanho correto
-      $this->elementos = array_pad($this->elementos, $this->alturaLayer, new LayerLinha($this->larguraLayer));
+  public function offsetSet($offset, $value) {
+    if ($value instanceof LayerLinha) {
+      if (is_null($offset)) { $this->elementos[] = $value;
+      } else { $this->elementos[$offset] = $value; }
     }
   }
 }

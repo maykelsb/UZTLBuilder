@@ -44,34 +44,34 @@
 * @see Layer
 * @see LayerLinha
 */
-class ArrayAccessIterator implements ArrayAccess, Iterator {
-  /**
-  * Indicação da posição atual do array de elementos.
-  * @var int
-  */
+abstract class ArrayAccessIterator implements ArrayAccess, Iterator {
   protected $posicao = 0;
-  /**
-  * Armazena os elementos da classe.
-  * @var array
-  */
   protected $elementos = array();
 
+  // -- ArrayAccess
+  public function offsetExists($offset) { echo trigger_error('offsetExists não implementado!'); }
+  public function offsetUnset($offset) { echo trigger_error('offsetUnset não implementado!'); }
   // -- Iterator
   public function current() { return $this->elementos[$this->posicao]; }
-  public function key() { return $this->posicao; }
   public function next() { ++$this->posicao; }
-  public function rewind() { $this->posicao = 0; }
+  public function key() { return $this->posicao; }
   public function valid() { return array_key_exists($this->posicao, $this->elementos); }
+  public function rewind() { $this->posicao = 0; }
 
-  // -- ArrayAccess
-  public function offsetExists($offset) { return isset($this->elementos[$offset]); }
-  public function offsetGet($offset) { return $this->elementos[$offset]; }
-  public function offsetSet($offset, $valor) {
-    if (is_null($offset)) {
-      $offset = count($this->elementos);
-      $this->elementos[$offset] = $valor;
+  // -- Funções de manutenção dos elementos em $this->elementos
+  public function array_slice($size, $offset = 0) {
+    $this->elementos = array_slice($this->elementos, $offset, $size);
+  }
+
+  public function array_pad($size, $value = null) {
+    if (is_array($value)) {
+      $class = $value['class'];
+      while (count($this->elementos) < $size) {
+        $this->elementos[] = new $class($value['param']);
+      }
+    } else {
+      $this->elementos = array_pad($this->elementos, $size, $value);
     }
   }
-  public function offsetUnset($offset) { unset($this->elementos[$offset]); }
 }
 ?>
