@@ -292,8 +292,8 @@ final class Projeto {
     $transparencia = imagecolorallocatealpha($imgTile, 0, 0, 0, 127);
     imagefill($imgTile, 0, 0, $transparencia);
     imagepng($imgTile, 'blank.png');
-    for ($x = 0; $x < (imagesx($imgTileset) / $this->larguraTile); $x++) {
-      for ($y = 0; $y < (imagesy($imgTileset) / $this->alturaTile); $y++) {
+    for ($y = 0; $y < (imagesy($imgTileset) / $this->alturaTile); $y++) {
+      for ($x = 0; $x < (imagesx($imgTileset) / $this->larguraTile); $x++) {
         $imgTile = imagecreatetruecolor($this->larguraTile, $this->alturaTile);
         imagealphablending($imgTile, false);
         imagesavealpha($imgTile, true);
@@ -302,7 +302,7 @@ final class Projeto {
           $x * $this->larguraTile,
           $y * $this->alturaTile,
           $this->larguraTile, $this->alturaTile);
-        imagepng($imgTile, sprintf("{$pathTiles}%02d-%02d.png", $x, $y));
+        imagepng($imgTile, sprintf("{$pathTiles}%02d-%02d.png", $y, $x));
       }
     }
   }
