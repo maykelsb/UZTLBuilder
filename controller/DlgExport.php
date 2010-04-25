@@ -49,9 +49,8 @@ class DlgExport extends Dialog {
   public function __construct(Projeto $prj) {
     parent::__construct();
     $this->projeto = $prj;;
-  }
 
-  private function montarMockUp() {
+    $this->imgMockup->set_from_file($this->projeto->pathDump);
   }
 }
 ?>

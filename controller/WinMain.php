@@ -53,10 +53,12 @@ final class WinMain extends Window {
   private $projeto = null;
 
   /**
-  *
+  * Armazena o nome do tile atualmente selecionado.
+  * @var string
   */
   private $sNomeTile;
 
+  // -- Dialogs
   /**
   * Define funcionalidades básicas para uma caixa de diálogo de manipulação de arquivo.
   *
@@ -81,30 +83,6 @@ final class WinMain extends Window {
   }
 
   /**
-  * Cria um novo projeto.
-  *
-  * Um projeto é composto por um arquivo de definição e diretório de trabalho.
-  * É recomendado que seja criado dentro do diretório 'projetos' dentro da
-  * instalação da app.
-  * @see Projeto
-  */
-  public function criarProjeto() {
-    $pathSelecionado = $this->dlgArquivos('Criar projeto', Gtk::FILE_CHOOSER_ACTION_SAVE);
-    // -- Se foi selecionado algum path, cria o projeto e ativa os botões
-    if (!is_null($pathSelecionado)) {
-      $nomeProjeto = substr($pathSelecionado, strrpos($pathSelecionado, DIRECTORY_SEPARATOR) + 1);
-      // -- Armazena referência do projeto criado
-      $this->projeto = Projeto::criarProjeto($pathSelecionado, $nomeProjeto);
-      $this->WinMain->set_title("{$this->tituloJanela} [{$nomeProjeto}]");
-      if (!is_null($this->projeto)) {
-        // -- Após criar o projeto, habilite os botões de configuração e de salvar
-        $this->tbtnSalvar->set_sensitive(true);
-        $this->tbtnConfigurar->set_sensitive(true);
-      }
-    }
-  }
-
-  /**
   * Abre um projeto criado anteriormente e redefine o título da janela com o caminho do projeto.
   */
   public function abrirProjeto() {
@@ -116,19 +94,6 @@ final class WinMain extends Window {
       $this->tbtnConfigurar->set_sensitive(true);
       $this->tbtnExportar->set_sensitive(true);
       $this->atualizarFormulario();
-    }
-  }
-
-  /**
-  * Salva as modificações no projeto.
-  *
-  * @see Projeto::salvarProjeto()
-  * @todo Colocar mensagem de projeto salvo com sucesso
-  */
-  public function salvarProjeto() {
-    $this->atualizarLayers();
-    if ($this->projeto->salvarProjeto()) {
-      // -- Mensagem de salvo com sucesso
     }
   }
 
@@ -156,9 +121,54 @@ final class WinMain extends Window {
   public function exibirFormExportar() {
     // -- Copiar conteúdo para a layer em memória
     $this->atualizarLayers();
+    $this->projeto->dumpLayersComoImagem();
     $dlg = new DlgExport($this->projeto);
     $dlg->run();
     $dlg->destroy();
+  }
+
+
+
+
+
+
+  /**
+  * Cria um novo projeto.
+  *
+  * Um projeto é composto por um arquivo de definição e diretório de trabalho.
+  * É recomendado que seja criado dentro do diretório 'projetos' dentro da
+  * instalação da app.
+  * @see Projeto
+  */
+  public function criarProjeto() {
+    $pathSelecionado = $this->dlgArquivos('Criar projeto', Gtk::FILE_CHOOSER_ACTION_SAVE);
+    // -- Se foi selecionado algum path, cria o projeto e ativa os botões
+    if (!is_null($pathSelecionado)) {
+      $nomeProjeto = substr($pathSelecionado, strrpos($pathSelecionado, DIRECTORY_SEPARATOR) + 1);
+      // -- Armazena referência do projeto criado
+      $this->projeto = Projeto::criarProjeto($pathSelecionado, $nomeProjeto);
+      $this->WinMain->set_title("{$this->tituloJanela} [{$nomeProjeto}]");
+      if (!is_null($this->projeto)) {
+        // -- Após criar o projeto, habilite os botões de configuração e de salvar
+        $this->tbtnSalvar->set_sensitive(true);
+        $this->tbtnConfigurar->set_sensitive(true);
+      }
+    }
+  }
+
+
+
+  /**
+  * Salva as modificações no projeto.
+  *
+  * @see Projeto::salvarProjeto()
+  * @todo Colocar mensagem de projeto salvo com sucesso
+  */
+  public function salvarProjeto() {
+    $this->atualizarLayers();
+    if ($this->projeto->salvarProjeto()) {
+      // -- Mensagem de salvo com sucesso
+    }
   }
 
   /**
