@@ -226,13 +226,13 @@ final class WinMain extends Window {
       // -- Corde fundo para aplicar nos event-boxes, que não são transparentes
       $gColor = GdkColor::parse($this->projeto->corDeFundo);
       // -- Preenchendo a grade com os tiles
-      for ($x = 0; $x < ($larguraTileset / $this->projeto->larguraTile); $x++) {
-        for ($y = 0; $y < ($alturaTileset / $this->projeto->alturaTile); $y++) {
+      for ($y = 0; $y < ($alturaTileset / $this->projeto->alturaTile); $y++) {
+        for ($x = 0; $x < ($larguraTileset / $this->projeto->larguraTile); $x++) {
           $evb = new GtkEventBox();
-          $evb->set_name(sprintf("%02d-%02d", $x, $y));
+          $evb->set_name(sprintf("%02d-%02d", $y, $x));
           $evb->connect('button-press-event', array($this, 'selectTile'));
           $evb->modify_bg(Gtk::STATE_NORMAL, $gColor);
-          $evb->add(GtkImage::new_from_file(sprintf("{$pathTile}%02d-%02d.png", $x, $y)));
+          $evb->add(GtkImage::new_from_file(sprintf("{$pathTile}%02d-%02d.png", $y, $x)));
           $frmTile = new GtkFrame();
           $frmTile->set_shadow_type(1);
           $frmTile->set_border_width(0);
