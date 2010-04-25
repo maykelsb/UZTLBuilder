@@ -81,6 +81,12 @@ final class Projeto {
   * @const PATH_TILES
   */
   const PATH_TILES = 'tiles';
+  /**
+  * Nome do diretório de dumps dentro da pasta de trabalho do projeto.
+  * @const PATH_DUMPS
+  */
+  const PATH_DUMPS = 'dumps';
+
 
   /**
   * Caminho do projeto.
@@ -99,6 +105,8 @@ final class Projeto {
   * @var array
   */
   private $layers = array();
+
+  private $pathDump;
 
   /**
   * Propriedades de configuração do projeto.
@@ -363,6 +371,41 @@ final class Projeto {
     unset($this->layers[$pos]);
     // -- Resetando chaves do array de layers
     $this->layers = array_values($this->layers);
+  }
+
+  public function dumpLayersComoImagem() {
+    // -- Verifica se existe o diretório de dumps
+    $pathDump = $this->pathProjeto . DIRECTORY_SEPARATOR . self::PATH_DUMPS . DIRECTORY_SEPARATOR;
+    if (!is_dir($pathDump)) {
+      if (!mkdir($pathDump)) {
+        trigger_error('Não foi possível criar a pasta de DUMPS.');
+      }
+    }
+
+    $dump = imagecreatetruecolor(
+      ($this->larguraMapa * $this->larguraTile),
+      ($this->alturaMapa * $this->alturaTile));
+    // -- Transparência para a imagem de fundo
+    imagesavealpha($dump, true);
+    $transparencia = imagecolorallocatealpha($dump, 0, 0, 0, 127);
+    imagefill($dump, 0, 0, $transparencia);
+
+    // -- Merge dos tiles na imagem final
+    $tilePath = $this->pathProjeto . DIRECTORY_SEPARATOR
+              . self::PATH_TILES . DIRECTORY_SEPARATOR;
+    foreach ($this->layers[0] as $iKeyLinha => $linhaLayer) {
+      foreach ($linhaLayer as $iKeyColuna => $tile) {
+        if (!is_null($tile)) {
+          imagecopy($dump, imagecreatefrompng("{$tilePath}{$tile}.png"),
+            ($iKeyLinha * $this->alturaTile), ($iKeyColuna * $this->larguraTile),
+            0, 0, $this->alturaTile, $this->larguraTile);
+        }
+      }
+    }
+    // -- Salvando a imagem na pasta de dumps
+    $pathDump = $pathDump . count(glob("{$pathDump}*.png")) . '.png';
+    imagepng($dump, $pathDump);
+    $this->pathDump = $pathDump;
   }
 }
 ?>
