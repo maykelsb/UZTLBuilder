@@ -240,7 +240,9 @@ final class Projeto {
     // -- Atributos do projeto
     foreach($spXML->attributes() as $key => $valor) { $this->$key = (string)$valor; }
     // -- Configurações do projeto
-    foreach ($spXML->configuracao[0]->children() as $key => $valor) { $this->$key = (string)$valor; }
+    foreach ($spXML->configuracao[0]->children() as $key => $valor) {
+      $this->$key = (string)$valor;
+    }
   }
 
   /**
@@ -316,10 +318,11 @@ final class Projeto {
   }
 
   /**
-  * Cria ou atualiza o conjunto de layers do projeto.
+  * Cria ou atualiza o conjunto de layers do projeto ajustando suas dimensões.
   */
   public function atualizarLayers() {
     if (empty($this->layers)) { // -- Cria as novas layers
+      // -- Vai dar problema duplicando as layers com referencia
       $this->layers = array_pad(array(), $this->quantidadeLayers, Layer::criarLayer($this->larguraMapa, $this->alturaMapa));
     } else { // -- Atualiza as layers existentes
       // -- Removendo layers
@@ -327,18 +330,16 @@ final class Projeto {
         $this->removerLayer();
       }
       // -- Aplicando resize nas layers que não foram removidas
-      if (($this->larguraMapa != $this->layers[0]->larguraLayer)
-          || ($this->alturaMapa != $this->layers[0]->alturaLayer)) {
+      list($larguraLayer, $alturaLayer) = $this->layers[0]->getDimensoes();
+      if (($this->larguraMapa != $larguraLayer)
+          || ($this->alturaMapa != $alturaLayer)) {
         foreach ($this->layers as $oLayer) {
-          $oLayer->larguraLayer = $this->larguraMapa;
-          $oLayer->alturaLayer = $this->alturaMapa;
+          $oLayer->setDimensoes($this->larguraMapa, $this->alturaMapa);
           $oLayer->ajustarDimensoesLayer();
         }
       }
       // -- Adicionando layers (no tamanho correto)
-      while (count($this->layers) < $this->quantidadeLayers) {
-        $this->adicionarLayer();
-      }
+      while (count($this->layers) < $this->quantidadeLayers) { $this->adicionarLayer(); }
     }
   }
 
@@ -383,8 +384,8 @@ final class Projeto {
     }
 
     $dump = imagecreatetruecolor(
-      ($this->larguraMapa * $this->larguraTile),
-      ($this->alturaMapa * $this->alturaTile));
+      ($this->larguraMapa),
+      ($this->alturaMapa));
     // -- Transparência para a imagem de fundo
     imagesavealpha($dump, true);
     $transparencia = imagecolorallocatealpha($dump, 0, 0, 0, 127);

@@ -78,5 +78,27 @@ class Controller {
     $filter->add_pattern($pattern);
     return $filter;
   }
+
+  /**
+  * Define funcionalidades básicas para uma caixa de diálogo de manipulação de arquivo.
+  *
+  * @param string $tituloCaixaSelecao  Com o título exibido pela caixa de diálogo;
+  * @param Action $tipoCaixaSelecao Tipo da caixa de diálogo (Abrir - Gtk::FILE_CHOOSER_ACTION_OPEN, Salvar - Gtk::FILE_CHOOSER_ACTION_SAVE);
+  * @return string com o caminho do arquivo selecionado.
+  */
+  protected function dlgArquivos($tituloCaixaSelecao, $tipoCaixaSelecao, $arrFiltro) {
+    $path = null;
+    $dlg = new GtkFileChooserDialog($tituloCaixaSelecao, null, $tipoCaixaSelecao,
+                                    array(Gtk::STOCK_OK, Gtk::RESPONSE_OK,
+                                          Gtk::STOCK_CANCEL, Gtk::RESPONSE_CANCEL));
+    // -- Caminho padrão de projetos e filtro para tipo de arquivo
+    $dlg->set_current_folder(DIR_PROJETOS);
+    $dlg->add_filter($this->createFileFilter($arrFiltro['desc'], $arrFiltro['ext']));
+    if (Gtk::RESPONSE_OK == $dlg->run()) {
+      $path = $dlg->get_filename();
+    }
+    $dlg->destroy();
+    return $path;
+  }
 }
 ?>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.3 on Sat Apr 24 09:43:09 2010 -->
+<!--Generated with glade3 3.4.3 on Sun Apr 25 11:08:34 2010 -->
 <glade-interface>
   <widget class="GtkWindow" id="WinMain">
     <property name="width_request">800</property>
@@ -10,6 +10,7 @@
     <property name="title">UZTLBuilder - UpZone Games</property>
     <property name="resizable">False</property>
     <property name="window_position">GTK_WIN_POS_CENTER</property>
+    <property name="icon">icones/Owl.ico</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
     <signal name="destroy" handler="closeWindow"/>
@@ -179,14 +180,14 @@
               <widget class="GtkVBox" id="vbxFerramentasTileset">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkScrolledWindow" id="scrolledwindow1">
+                  <widget class="GtkScrolledWindow" id="scwLayers">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                     <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
                     <child>
-                      <widget class="GtkViewport" id="viewport1">
-                        <property name="height_request">100</property>
+                      <widget class="GtkViewport" id="vwpLayers">
+                        <property name="height_request">50</property>
                         <property name="visible">True</property>
                         <property name="resize_mode">GTK_RESIZE_QUEUE</property>
                         <child>
@@ -198,58 +199,6 @@
                       </widget>
                     </child>
                   </widget>
-                </child>
-                <child>
-                  <widget class="GtkHBox" id="hbox1">
-                    <property name="visible">True</property>
-                    <property name="homogeneous">True</property>
-                    <child>
-                      <widget class="GtkButton" id="btnBotaoEsquerdo">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="focus_on_click">False</property>
-                        <property name="response_id">0</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkButton" id="btnBotaoDireito">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="focus_on_click">False</property>
-                        <property name="response_id">0</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkToggleButton" id="tgbtnLimpar">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="label" translatable="yes">gtk-clear</property>
-                        <property name="use_stock">True</property>
-                        <property name="focus_on_click">False</property>
-                        <property name="image_position">GTK_POS_TOP</property>
-                        <property name="response_id">0</property>
-                        <property name="draw_indicator">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                  </widget>
-                  <packing>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkScrolledWindow" id="scwTileset">
@@ -271,7 +220,7 @@
                     </child>
                   </widget>
                   <packing>
-                    <property name="position">2</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
               </widget>
