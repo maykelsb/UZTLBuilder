@@ -45,12 +45,25 @@
 */
 class DlgExport extends Dialog {
   private $projeto;
+  private $mockupPath;
 
   public function __construct(Projeto $prj) {
     parent::__construct();
     $this->projeto = $prj;;
+    // -- Exibição do mockup da fase criada.
+    $this->mockupPath->set_from_file($this->projeto->pathDump);
+  }
 
-    $this->imgMockup->set_from_file($this->projeto->pathDump);
+  public function indicaDestinoImagem() {
+    $pathDestino = $this->dlgArquivos('Salvar imagem',
+                                      Gtk::FILE_CHOOSER_ACTION_SAVE,
+                                      array('desc' => 'Arquivo PNG',
+                                            'ext' => '*.png'));
+    if (!is_null($pathDestino)) {
+      if (!copy($this->mockupPath, $pathDestino)) {
+        trigger_error('Não foi possível copiar o arquivo para o caminho solicitado.');
+      }
+    }
   }
 }
 ?>

@@ -61,7 +61,7 @@ class Layer extends ArrayAccessIterator {
   private $nome;
 
   // -- Getters and Setters
-  public function setDimensoes($altura, $largura) {
+  public function setDimensoes($largura, $altura) {
     $this->alturaLayer = $altura;
     $this->larguraLayer = $largura;
   }
@@ -73,9 +73,9 @@ class Layer extends ArrayAccessIterator {
   // -- Construtores
   private function __construct() {}
 
-  public static function criarLayer($altura, $largura) {
+  public static function criarLayer($largura, $altura) {
     $layer = new Layer();
-    $layer->setDimensoes($altura, $largura);
+    $layer->setDimensoes($largura, $altura);
     while($altura--) { $layer[] = new LayerLinha($largura); }
     return $layer;
   }
@@ -95,23 +95,22 @@ class Layer extends ArrayAccessIterator {
 
   // -- Métodos de manutenção
   public function ajustarDimensoesLayer() {
-    $larguraAtual = count($this->elementos[0]);
-    $alturaAtual = count($this->elementos);
-
+    $larguraAtual = $this[0]->count();
+    $alturaAtual = $this->count();
     // -- A ordenação dos ajustes visa uma melhor performance, sem desperdiçar ações
     if ($this->alturaLayer < $alturaAtual) { // -- Remove linhas do final
       $this->array_slice($this->alturaLayer);
     }
     if ($this->larguraLayer < $larguraAtual) {
       // -- Remove colunas do final de todas as linhas
-      foreach ($this->elementos as &$linha) {
-        $linha->array_slice($this->larguraLayer);
+      foreach ($this as $key => $linha) {
+        $this[$key]->array_slice($this->larguraLayer);
       }
     }
     if ($this->larguraLayer > $larguraAtual) {
       // -- Adiciona colunas no final de todas as linhas
-      foreach ($this->elementos as &$linha) {
-        $linha->array_pad($this->larguraLayer);
+      foreach ($this as $key => $linha) {
+        $this[$key]->array_pad($this->larguraLayer);
       }
     }
     if ($this->alturaLayer > $alturaAtual) {

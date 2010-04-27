@@ -60,33 +60,13 @@ final class WinMain extends Window {
 
   // -- Dialogs
   /**
-  * Define funcionalidades básicas para uma caixa de diálogo de manipulação de arquivo.
-  *
-  * @param string $tituloCaixaSelecao  Com o título exibido pela caixa de diálogo;
-  * @param Action $tipoCaixaSelecao Tipo da caixa de diálogo (Abrir - Gtk::FILE_CHOOSER_ACTION_OPEN, Salvar - Gtk::FILE_CHOOSER_ACTION_SAVE);
-  * @return string com o caminho do arquivo selecionado.
-  */
-  private function dlgArquivos($tituloCaixaSelecao, $tipoCaixaSelecao) {
-    $path = null;
-    $dlg = new GtkFileChooserDialog($tituloCaixaSelecao, null, $tipoCaixaSelecao,
-                                    array(Gtk::STOCK_OK, Gtk::RESPONSE_OK,
-                                          Gtk::STOCK_CANCEL, Gtk::RESPONSE_CANCEL));
-    // -- Caminho padrão de projetos e filtro para tipo de arquivo
-    $dlg->set_current_folder(DIR_PROJETOS);
-    $dlg->add_filter($this->createFileFilter(Projeto::DESC_TIPO_ARQUIVO_PROJETO,
-      '*.'. Projeto::EXTENCAO_ARQUIVO_PROJETO));
-    if (Gtk::RESPONSE_OK == $dlg->run()) {
-      $path = $dlg->get_filename();
-    }
-    $dlg->destroy();
-    return $path;
-  }
-
-  /**
   * Abre um projeto criado anteriormente e redefine o título da janela com o caminho do projeto.
   */
   public function abrirProjeto() {
-    $pathSelecionado = $this->dlgArquivos('Abrir projeto', Gtk::FILE_CHOOSER_ACTION_OPEN);
+    $pathSelecionado = $this->dlgArquivos('Abrir projeto',
+                                          Gtk::FILE_CHOOSER_ACTION_OPEN,
+                                          array('desc' => Projeto::DESC_TIPO_ARQUIVO_PROJETO,
+                                                'ext' => '*.'. Projeto::EXTENCAO_ARQUIVO_PROJETO));
     if (!is_null($pathSelecionado)) {
       $this->projeto = Projeto::abrirProjeto($pathSelecionado);
       // -- Após criar o projeto, habilite os botões de configuração e de salvar
@@ -94,6 +74,9 @@ final class WinMain extends Window {
       $this->tbtnConfigurar->set_sensitive(true);
       $this->tbtnExportar->set_sensitive(true);
       $this->atualizarFormulario();
+
+
+
     }
   }
 
@@ -127,11 +110,6 @@ final class WinMain extends Window {
     $dlg->destroy();
   }
 
-
-
-
-
-
   /**
   * Cria um novo projeto.
   *
@@ -141,7 +119,10 @@ final class WinMain extends Window {
   * @see Projeto
   */
   public function criarProjeto() {
-    $pathSelecionado = $this->dlgArquivos('Criar projeto', Gtk::FILE_CHOOSER_ACTION_SAVE);
+    $pathSelecionado = $this->dlgArquivos('Criar projeto',
+                                          Gtk::FILE_CHOOSER_ACTION_SAVE,
+                                          array('desc' => Projeto::DESC_TIPO_ARQUIVO_PROJETO,
+                                                'ext' => '*.'. Projeto::EXTENCAO_ARQUIVO_PROJETO));
     // -- Se foi selecionado algum path, cria o projeto e ativa os botões
     if (!is_null($pathSelecionado)) {
       $nomeProjeto = substr($pathSelecionado, strrpos($pathSelecionado, DIRECTORY_SEPARATOR) + 1);
@@ -152,11 +133,10 @@ final class WinMain extends Window {
         // -- Após criar o projeto, habilite os botões de configuração e de salvar
         $this->tbtnSalvar->set_sensitive(true);
         $this->tbtnConfigurar->set_sensitive(true);
+        $this->tbtnExportar->set_sensitive(true);
       }
     }
   }
-
-
 
   /**
   * Salva as modificações no projeto.
@@ -200,11 +180,12 @@ final class WinMain extends Window {
   * </li></ul>
   */
   public function atualizarFormulario() {
-    $this->WinMain->set_title("{$this->tituloJanela} [{$nomeProjeto}]");
+    $this->WinMain->set_title("{$this->tituloJanela} [{$this->projeto->nomeProjeto}]");
     $this->atualizarCorDeFundo();
     $this->carregarTileset();
     $this->carregarListaLayers();
     $this->carregarAreaTrabalho();
+    var_dump($this->projeto);
     // -- Exibindo alterações
     $this->WinMain->show_all();
   }
@@ -311,7 +292,7 @@ final class WinMain extends Window {
   }
 
   private function carregarAreaTrabalho() {
-    if ((!is_null($this->projeto->larguraMapa)) && (!is_null($this->projeto->alturaMapa))) {
+    if (('' != $this->projeto->larguraMapa) && ('' != $this->projeto->alturaMapa)) {
       // -- removendo as tabelas de camadas já construídas
       foreach ($this->fxdAreaTrabalho->get_children() as $child) {
         $this->fxdAreaTrabalho->remove($child);
@@ -324,13 +305,17 @@ final class WinMain extends Window {
 
       // -- Criando as layers do projeto
       foreach ($this->projeto->layers as $layer) {
-        // -- Criando a tabela de tiles da layer com tamanho suficiente para o frame que abrigará o tile
-        $tblLayer = new GtkTable((int)$this->projeto->larguraMapa * ((int)$this->projeto->larguraTile + 2),
-          (int)$this->projeto->alturaMapa * ((int)$this->projeto->alturaTile + 2));
+        // -- Criando a tabela de tiles da layer
+        $tblLayer = new GtkTable($this->projeto->alturaMapa, $this->projeto->larguraMapa);
+
+      var_dump($this->projeto);
+      echo 'oi';
+      die();
+
         // -- Corde fundo para aplicar nos event-boxes, que não são transparentes
         $gColor = GdkColor::parse($this->projeto->corDeFundo);
-        foreach ($layer as $col => $linhaTiles) {
-          foreach ($linhaTiles as $row => $tile) {
+        foreach ($layer as $keyLinha => $linhaTiles) {
+          foreach ($linhaTiles as $keyColuna => $tile) {
             $evb = new GtkEventBox();
             $evb->connect('button-press-event', array($this, 'insertTile'));
             $evb->modify_bg(Gtk::STATE_NORMAL, $gColor);
@@ -347,7 +332,7 @@ final class WinMain extends Window {
               $evb->add($imgTile);
             }
             // -- Anexando o tile à tabela da área de trabalho
-            $tblLayer->attach($frmTile, $col, $col + 1, $row, $row + 1,
+            $tblLayer->attach($frmTile, $keyColuna, $keyColuna + 1, $keyLinha, $keyLinha + 1,
               Gtk::EXPAND + Gtk::FILL, Gtk::EXPAND + Gtk::FILL, 0, 0);
           }
         }

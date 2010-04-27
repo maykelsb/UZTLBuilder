@@ -73,5 +73,7 @@ abstract class ArrayAccessIterator implements ArrayAccess, Iterator {
       $this->elementos = array_pad($this->elementos, $size, $value);
     }
   }
+
+  public function count() { return count($this->elementos); }
 }
 ?>
