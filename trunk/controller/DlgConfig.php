@@ -93,9 +93,13 @@ class DlgConfig extends Dialog {
     $this->cbAlturaTile->set_active($keyAltura);
     unset($arTamTiles, $keyLargura, $keyAltura);
     // -- Inicializa dimensões do mapa
-    if (!is_null($prj->larguraMapa)) { $this->spbLarguraMapa->set_value($prj->larguraMapa); }
+
+    $lrgMapa = $prj->larguraMapa;
+    $altMapa = $prj->alturaMapa;
+
+    if (!is_null($lrgMapa)) { $this->spbLarguraMapa->set_value($lrgMapa); }
       else { $this->spbLarguraMapa->set_value(10); }
-    if (!is_null($prj->alturaMapa)) { $this->spbAlturaMapa->set_value($prj->alturaMapa); }
+    if (!is_null($altMapa)) { $this->spbAlturaMapa->set_value($altMapa); }
       else { $this->spbAlturaMapa->set_value(10); }
     // -- Quantidade de layers
     if (!is_null($prj->quantidadeLayers)) { $this->spbQtdLayers->set_value($prj->quantidadeLayers); }
