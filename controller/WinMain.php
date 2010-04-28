@@ -84,6 +84,11 @@ final class WinMain extends Window {
   * Abre o formulário de configuração do projeto.
   */
   public function exibirFormConfiguracao() {
+
+    
+    var_dump($this->projeto);
+    
+
     if (is_null($this->projeto)) {
       trigger_error('Nenhum projeto aberto para configuração.', E_USER_ERROR);
     }
@@ -185,7 +190,6 @@ final class WinMain extends Window {
     $this->carregarTileset();
     $this->carregarListaLayers();
     $this->carregarAreaTrabalho();
-    var_dump($this->projeto);
     // -- Exibindo alterações
     $this->WinMain->show_all();
   }
@@ -306,11 +310,9 @@ final class WinMain extends Window {
       // -- Criando as layers do projeto
       foreach ($this->projeto->layers as $layer) {
         // -- Criando a tabela de tiles da layer
-        $tblLayer = new GtkTable($this->projeto->alturaMapa, $this->projeto->larguraMapa);
-
-      var_dump($this->projeto);
-      echo 'oi';
-      die();
+        $altMapa = $this->projeto->alturaMapa;
+        $lrgMapa = $this->projeto->larguraMapa;
+        $tblLayer = new GtkTable($altMapa, $lrgMapa);
 
         // -- Corde fundo para aplicar nos event-boxes, que não são transparentes
         $gColor = GdkColor::parse($this->projeto->corDeFundo);
