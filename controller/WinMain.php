@@ -74,9 +74,6 @@ final class WinMain extends Window {
       $this->tbtnConfigurar->set_sensitive(true);
       $this->tbtnExportar->set_sensitive(true);
       $this->atualizarFormulario();
-
-
-
     }
   }
 
@@ -84,11 +81,6 @@ final class WinMain extends Window {
   * Abre o formulário de configuração do projeto.
   */
   public function exibirFormConfiguracao() {
-
-    
-    var_dump($this->projeto);
-    
-
     if (is_null($this->projeto)) {
       trigger_error('Nenhum projeto aberto para configuração.', E_USER_ERROR);
     }
@@ -110,7 +102,7 @@ final class WinMain extends Window {
     // -- Copiar conteúdo para a layer em memória
     $this->atualizarLayers();
     $this->projeto->dumpLayersComoImagem();
-    $dlg = new DlgExport($this->projeto);
+    $dlg = new DlgExport($this->projeto->pathDump);
     $dlg->run();
     $dlg->destroy();
   }
@@ -310,8 +302,9 @@ final class WinMain extends Window {
       // -- Criando as layers do projeto
       foreach ($this->projeto->layers as $layer) {
         // -- Criando a tabela de tiles da layer
-        $altMapa = $this->projeto->alturaMapa;
-        $lrgMapa = $this->projeto->larguraMapa;
+        $altMapa = (int)$this->projeto->alturaMapa;
+        $lrgMapa = (int)$this->projeto->larguraMapa;
+
         $tblLayer = new GtkTable($altMapa, $lrgMapa);
 
         // -- Corde fundo para aplicar nos event-boxes, que não são transparentes
