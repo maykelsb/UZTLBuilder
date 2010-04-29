@@ -1,0 +1,411 @@
+<?php
+/**
+* UZTLBuilder
+* An app to build tiled layers for JavaME in PHP-GTK.
+* Copyright (c) 2009-2010 Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>
+* -----------------------------------------------------------------------------
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations
+* under the License.
+*
+* The Original Code is
+*   Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>.
+*
+* The Initial Developer of the Original Code is
+*   Maykel "Gardner" dos Santos Braz <maykelsb@yahoo.com.br>.
+* Portions created by Initial Developer are Copyright (C) 2009-2010
+* Initial Developer. All Rights Reserved.
+*
+* Contributor(s): None
+*
+* Alternatively, the contents of this file may be used under the terms
+* of the New BSD license (the "New BSD License"), in which case the
+* provisions of New BSD License are applicable instead of those
+* above. If you wish to allow use of your version of this file only
+* under the terms of the New BSD License and not to allow others to use
+* your version of this file under the MPL, indicate your decision by
+* deleting the provisions above and replace them with the notice and
+* other provisions required by the New BSD License. If you do not delete
+* the provisions above, a recipient may use your version of this file
+* under either the MPL or the New BSD License.
+*
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
+*/
+
+/**
+* Classe de persistência de projetos.
+*
+* Faz o controle de persistência dos projetos como: criar, carregar, abrir e salvar.
+* Também define informações sobre tipo de arquivo.
+* @property string $nomeProjeto Nome do projeto, o nome do arquivo de configuração e do diretório de trabalho do projeto;
+* @property int $larguraTile
+* @property int $alturaTile
+* @property int $larguraMapa
+* @property int $alturaMapa
+* @property int $quantidadeLayers
+* @property string $corDeFundo
+* @property string $pathTileset
+* @property string $linguagemExport
+* @final
+*
+* @author Maykel dos Santos Braz <maykelsb@yahoo.com.br>
+*/
+final class Projeto {
+
+  /**
+  * Referência para instância desta classe.
+  * @var Projeto
+  * @see Projeto
+  */
+  private static $projeto = null;
+
+  /**
+  * Extenção utilizada pelos arquivos de definição de projetos.
+  * @const EXTENCAO_ARQUIVO_PROJETO
+  */
+  const EXTENCAO_ARQUIVO_PROJETO = 'uzp';
+
+  /**
+  * Descrição do tipo de arquivo de projeto.
+  * @const DESC_TIPO_ARQUIVO_PROJETO
+  */
+  const DESC_TIPO_ARQUIVO_PROJETO = 'Projeto UZTLBuilder';
+  /**
+  * Nome do diretório de tiles dentro da pasta de trabalho do projeto.
+  * @const PATH_TILES
+  */
+  const PATH_TILES = 'tiles';
+  /**
+  * Nome do diretório de dumps dentro da pasta de trabalho do projeto.
+  * @const PATH_DUMPS
+  */
+  const PATH_DUMPS = 'dumps';
+
+
+  /**
+  * Caminho do projeto.
+  * @var string
+  */
+  private $pathProjeto = '';
+
+  /**
+  * Data de criação do projeto no formato 'Ymd';
+  * @var string
+  */
+  private $dataCriacao = '';
+
+  /**
+  * Armazena as layers do projeto.
+  * @var array
+  */
+  private $layers = array();
+
+  private $pathDump;
+
+  /**
+  * Propriedades de configuração do projeto.
+  * @var array
+  * @see Projeto
+  */
+  private $propriedades = array(
+    'nomeProjeto' => null,
+    'larguraTile' => null,
+    'alturaTile' => null,
+    'larguraMapa' => null,
+    'alturaMapa' => null,
+    'quantidadeLayers' => null,
+    'corDeFundo' => null,
+    'pathTileset' => null,
+    'linguagemExport' => null);
+
+  /**
+  * Retorna as propriedades da classe.
+  * @param string $prop Nome da propriedade da classe.
+  */
+  public function __get($prop) {
+    if (($prop != 'propriedades')
+        && array_key_exists($prop, get_class_vars(__CLASS__))) { return $this->$prop;
+    } else if (array_key_exists($prop, $this->propriedades)) { return $this->propriedades[$prop];
+    } else { trigger_error("Propriedade ({$prop}) do projeto não definida!", E_USER_ERROR); }
+  }
+
+  /**
+  * Define um valor para as propriedade das clase.
+  * @param string $prop Nome da propriedade;
+  * @param mixed $valor Novo valor para a propriedade;
+  */
+  public function __set($prop, $valor) {
+    if (($prop != 'propriedades')
+        && array_key_exists($prop, get_class_vars(__CLASS__))) { $this->$prop = $valor;
+    } else if (array_key_exists($prop, $this->propriedades)) { $this->propriedades[$prop] = $valor;
+    } else { trigger_error("Propriedade ({$prop}) do projeto não definida!", E_USER_ERROR); }
+  }
+
+  /**
+  * Construtor (privado).
+  *
+  * O projeto deve ser instanciado apenas através de chamadas a criarProjeto e
+  * abrirProjeto.
+  * @see Projeto::criarProjeto();
+  * @see Projeto::abrirProjeto();
+  */
+  private function __construct() { }
+
+  /**
+  * Cria um projeto e armazena o caminho do projeto, o nome e a data de criação.
+  *
+  * @param string $path Caminho onde o projeto será salvo;
+  * @param string $nome O nome do projeto, e do diretório do projeto;
+  * @return Projeto Referência para o projeto.
+  */
+  public static function criarProjeto($path, $nome) {
+    // -- Criação do objeto do projeto e criação das layers
+    self::$projeto = new Projeto();
+    self::$projeto->pathProjeto = $path;
+    self::$projeto->nomeProjeto = $nome;
+    self::$projeto->dataCriacao = date('Ymd');
+    return self::$projeto;
+  }
+
+  /**
+  * Abre um projeto salvo previamente.
+  *
+  * O projeto é aberto e sua referência é salva dentro da classe, desta forma
+  * quando o projeto é aberto, sua referência é atualizada para o novo projeto
+  * @param string $path Caminho do arquivo de referência do projeto.
+  * @return Projeto
+  */
+  public static function abrirProjeto($path) {
+    if (!is_file($path)) { trigger_error('Não foi possível abrir o projeto.', E_USER_ERROR); }
+    self::$projeto = new Projeto();
+    self::$projeto->carregarXML($path);
+    self::$projeto->carregarLayers();
+    return self::$projeto;
+  }
+
+  /**
+  * Salva as informações armazenadas no objeto do projeto no arquivo de configuração do projeto.
+  * @return boolean
+  */
+  public function salvarProjeto() {
+    $file = $this->pathProjeto . '.' . self::EXTENCAO_ARQUIVO_PROJETO;
+    $domDoc = new DomDocument('1.0', 'iso-8859-1');
+    $elmRoot = $domDoc->appendChild(new DomElement('projeto'));
+    $elmRoot->setAttributeNode(new DOMAttr('pathProjeto', $this->pathProjeto));
+    $elmRoot->setAttributeNode(new DOMAttr('dataCriacao', $this->dataCriacao));
+    $elmConfig = $elmRoot->appendChild(new DomElement('configuracao'));
+    // -- Adicionando propriedades de configuração ao XML
+    foreach ($this->propriedades as $key => $valor) {
+      $elmConfig->appendChild(new DomElement($key, $this->$key));
+    }
+    // -- Salvando o XML de configuração do projeto
+    if (!file_put_contents("{$this->pathProjeto}." . self::EXTENCAO_ARQUIVO_PROJETO, $domDoc->saveXML())) {
+      trigger_error('Não foi possível salvar o arquivo de configuração do projeto.', E_USER_ERROR);
+    }
+    // -- Criando diretório de trabalho, se já não foi criado pela janela de configuração
+    if (!is_dir($this->pathProjeto)) {
+      if (!mkdir($this->pathProjeto)) {
+        trigger_error('Não foi possível criar o diretório de trabalho do projeto.');
+      }
+    }
+
+    // -- Apagando os arquivos de camadas (pro caso de alguma ter sido removida)
+    foreach (glob($this->pathProjeto . DIRECTORY_SEPARATOR . "*." . Layer::EXTENCAO_ARQUIVO_LAYER) as $pathLayer) {
+      unlink($pathLayer);
+    }
+
+    // -- Salvando o XML das layers
+    foreach ($this->layers as $iKey => $oLayer) { $oLayer->salvarLayer($this->pathProjeto, $iKey); }
+    return true;
+  }
+
+  /**
+  * Carrega um XML de configuração salvo previamente.
+  *
+  * Lê o XML em um objeto simplexml e carrega as propriedades do projeto e das
+  * configurações do projeto no objeto do projeto.
+  * @param string $path Path onde está salvo o xml de configuração (com a extenção do projeto).
+  * @see Projeto::EXTENCAO_ARQUIVO_PROJETO
+  */
+  private function carregarXML($path) {
+    if (!($spXML = simplexml_load_file($path))) {
+      trigger_error('Não foi possível carregar definições do projeto.', E_USER_ERROR);
+    }
+    // -- Atributos do projeto
+    foreach($spXML->attributes() as $key => $valor) { $this->$key = (string)$valor; }
+    // -- Configurações do projeto
+    foreach ($spXML->configuracao[0]->children() as $key => $valor) {
+      $this->$key = (string)$valor;
+    }
+  }
+
+  /**
+  * Carrega as layers salvas no diretório do projeto.
+  * @see Layer
+  */
+  private function carregarLayers() {
+    $fltLayers = $this->pathProjeto . DIRECTORY_SEPARATOR . '*.' . Layer::EXTENCAO_ARQUIVO_LAYER;
+    $arrLayers = glob($fltLayers);
+    sort($arrLayers);
+    foreach ($arrLayers as $XMLLayer) {
+      $this->layers[] = Layer::carregarLayer($XMLLayer);
+    }
+  }
+
+  /**
+  * Copia o tileset do local indicado pelo usuário para o diretório de trabalho do projeto.
+  *
+  * Também chama a função de quebra de tileset.
+  */
+  public function copiarTileset() {
+    $pathDestinoTileset = $this->pathProjeto . DIRECTORY_SEPARATOR . 'tileset.png';
+
+    if (($this->pathTileset != $pathDestinoTileset) && !is_null($this->pathTileset)) {
+      // -- Criando diretório de trabalho, se já não foi criado pelo salvamento do projeto
+      if (!is_dir($this->pathProjeto)) {
+        if (!mkdir($this->pathProjeto)) {
+          trigger_error('Não foi possível criar o diretório de trabalho do projeto.');
+        }
+      }
+      // -- Copiando o arquivo do caminho indicado pelo usuário para o diretório de trabalho do projeto
+      if (!copy($this->pathTileset, $pathDestinoTileset)) {
+        trigger_error('Falha ao copiar tileset para diretório de trabalho.', E_USER_ERROR);
+      }
+      // -- Quebrando o tileset em tiles para exibição na área de tileset
+      $this->quebrarTileset();
+      $this->pathTileset = $pathDestinoTileset;
+    }
+  }
+
+  /**
+  * Quebra o tileset em tiles do tamanho configurado para o projeto.
+  * 
+  * Apaga os tilesets antigos e recria o diretório de tiles vazio. A seguir, pega
+  * as configurações do projeto e cria os tiles que serão utilizados para construir
+  * as fases.
+  */
+  private function quebrarTileset() {
+    $pathTiles = $this->pathProjeto . DIRECTORY_SEPARATOR . 'tiles' . DIRECTORY_SEPARATOR;
+    // -- Apaga o diretório e seu conteúdo (tiles antigos)
+    if (is_dir($pathTiles)) { Filesystem::delDir($pathTiles); }
+    if (!mkdir($pathTiles)) { trigger_error('Não foi possível criar o diretório de tiles.', E_USER_ERROR); }
+    // -- Cria os tiles do projeto
+    $imgTileset = imagecreatefrompng($this->pathProjeto . DIRECTORY_SEPARATOR . 'tileset.png');
+    $imgTile = imagecreatetruecolor($this->larguraTile, $this->alturaTile);
+    imagesavealpha($imgTile, true);
+    $transparencia = imagecolorallocatealpha($imgTile, 0, 0, 0, 127);
+    imagefill($imgTile, 0, 0, $transparencia);
+    imagepng($imgTile, 'blank.png');
+    for ($y = 0; $y < (imagesy($imgTileset) / $this->alturaTile); $y++) {
+      for ($x = 0; $x < (imagesx($imgTileset) / $this->larguraTile); $x++) {
+        $imgTile = imagecreatetruecolor($this->larguraTile, $this->alturaTile);
+        imagealphablending($imgTile, false);
+        imagesavealpha($imgTile, true);
+        imagefill($imgTile, 0, 0, $transparencia);
+        imagecopy($imgTile, $imgTileset, 0, 0,
+          $x * $this->larguraTile,
+          $y * $this->alturaTile,
+          $this->larguraTile, $this->alturaTile);
+        imagepng($imgTile, sprintf("{$pathTiles}%02d-%02d.png", $y, $x));
+      }
+    }
+  }
+
+  /**
+  * Cria ou atualiza o conjunto de layers do projeto ajustando suas dimensões.
+  */
+  public function atualizarLayers() {
+    if (empty($this->layers)) { // -- Cria as novas layers
+      // -- Vai dar problema duplicando as layers com referencia
+      $this->layers = array_pad(array(), $this->quantidadeLayers, Layer::criarLayer($this->larguraMapa, $this->alturaMapa));
+    } else { // -- Atualiza as layers existentes
+      // -- Removendo layers
+      while (count($this->layers) > $this->quantidadeLayers) {
+        $this->removerLayer();
+      }
+      // -- Aplicando resize nas layers que não foram removidas
+      list($larguraLayer, $alturaLayer) = $this->layers[0]->getDimensoes();
+      if (($this->larguraMapa != $larguraLayer)
+          || ($this->alturaMapa != $alturaLayer)) {
+        foreach ($this->layers as $oLayer) {
+          $oLayer->setDimensoes($this->larguraMapa, $this->alturaMapa);
+          $oLayer->ajustarDimensoesLayer();
+        }
+      }
+      // -- Adicionando layers (no tamanho correto)
+      while (count($this->layers) < $this->quantidadeLayers) { $this->adicionarLayer(); }
+    }
+  }
+
+  /**
+  * Adiciona uma nova layer em branco ao projeto na posição solicitada.
+  * @param int $pos Posição de inserção da nova camada, se não for informada, é inserida no fim da lista de camadas.
+  */
+  private function adicionarLayer($pos = null) {
+    if (array_key_exists($pos, $this->layers)) {
+      $tmpArray = array();
+      foreach ($this->layers as $key => $item) {
+        if ($key < $pos) { $tmpArray[$key] = $item; } // -- Itens anteriores ao novo
+        else if ($key > $pos) { $tmpArray[$key + 1] = $item; } // -- Itens posteriores ao novo
+        else { // -- Posição de inserção
+          $tmpArray[$key] = Layer::criarLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
+        }
+      }
+      $this->layers = $tmpArray;
+    } else { // -- Posição não existe ou é nula
+      $this->layers[] = Layer::criarLayer($this->projeto->larguraMapa, $this->projeto->alturaMapa);
+    }
+  }
+
+  /**
+  * Remove a layer na posição indicada.
+  * @param int $pos Posição da layer a ser removida, se não for informada, é removida a última layer.
+  */
+  private function removerLayer($pos = null) {
+    if (is_null($pos)) { $pos = (count($this->layers) - 1); }
+    unset($this->layers[$pos]);
+    // -- Resetando chaves do array de layers
+    $this->layers = array_values($this->layers);
+  }
+
+  public function dumpLayersComoImagem() {
+    // -- Verifica se existe o diretório de dumps
+    $pathDump = $this->pathProjeto . DIRECTORY_SEPARATOR . self::PATH_DUMPS . DIRECTORY_SEPARATOR;
+    if (!is_dir($pathDump)) {
+      if (!mkdir($pathDump)) {
+        trigger_error('Não foi possível criar a pasta de DUMPS.');
+      }
+    }
+
+    $dump = imagecreatetruecolor(($this->larguraMapa * $this->larguraTile),
+                                 ($this->alturaMapa * $this->alturaTile));
+    // -- Transparência para a imagem de fundo
+    imagesavealpha($dump, true);
+    $transparencia = imagecolorallocatealpha($dump, 0, 0, 0, 127);
+    imagefill($dump, 0, 0, $transparencia);
+
+    // -- Merge dos tiles na imagem final
+    $tilePath = $this->pathProjeto . DIRECTORY_SEPARATOR
+              . self::PATH_TILES . DIRECTORY_SEPARATOR;
+    foreach ($this->layers[0] as $iKeyLinha => $linhaLayer) {
+      foreach ($linhaLayer as $iKeyColuna => $tile) {
+        if (!is_null($tile)) {
+          imagecopy($dump, imagecreatefrompng("{$tilePath}{$tile}.png"),
+                    ($iKeyColuna * $this->larguraTile), ($iKeyLinha * $this->alturaTile),
+                    0, 0, $this->alturaTile, $this->larguraTile);
+        }
+      }
+    }
+    // -- Salvando a imagem na pasta de dumps
+    $pathDump = $pathDump . count(glob("{$pathDump}*.png")) . '.png';
+    imagepng($dump, $pathDump);
+    $this->pathDump = $pathDump;
+  }
+}
+?>
