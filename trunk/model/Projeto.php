@@ -383,9 +383,8 @@ final class Projeto {
       }
     }
 
-    $dump = imagecreatetruecolor(
-      ($this->larguraMapa),
-      ($this->alturaMapa));
+    $dump = imagecreatetruecolor(($this->larguraMapa * $this->larguraTile),
+                                 ($this->alturaMapa * $this->alturaTile));
     // -- Transparência para a imagem de fundo
     imagesavealpha($dump, true);
     $transparencia = imagecolorallocatealpha($dump, 0, 0, 0, 127);
@@ -398,8 +397,8 @@ final class Projeto {
       foreach ($linhaLayer as $iKeyColuna => $tile) {
         if (!is_null($tile)) {
           imagecopy($dump, imagecreatefrompng("{$tilePath}{$tile}.png"),
-            ($iKeyLinha * $this->alturaTile), ($iKeyColuna * $this->larguraTile),
-            0, 0, $this->alturaTile, $this->larguraTile);
+                    ($iKeyColuna * $this->larguraTile), ($iKeyLinha * $this->alturaTile),
+                    0, 0, $this->alturaTile, $this->larguraTile);
         }
       }
     }

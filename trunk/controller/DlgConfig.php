@@ -72,8 +72,9 @@ class DlgConfig extends Dialog {
   * configurado previamente, quando eles assumem os valores já definidos.
   * @param Projeto $prj Referência para o projeto.
   */
-  public function __construct(Projeto &$prj) {
+  public function __construct(Projeto $prj) {
     parent::__construct();
+
     $this->projeto = $prj;
     // -- Filtros e diretório inicial
     $this->fcbCarrTileset->add_filter($this->createFileFilter('Arquivos PNG', '*.png'));
