@@ -51,7 +51,7 @@ class Controller {
   private $glade;
 
   public function __construct() {
-    $this->glade = new GladeXML('view/' . get_class($this) . '.glade');
+    $this->glade = new GladeXML(ROOT . 'view/' . get_class($this) . '.glade');
     $this->glade->signal_autoconnect_instance($this);
   }
 
