@@ -59,5 +59,10 @@ abstract class Dialog extends Controller {
     }
     return $this->$dlg->$funcname();
   }
+
+  public function run() {
+    $dlg = get_class($this);
+    return $this->$dlg->run();
+  }
 }
 ?>

@@ -138,8 +138,12 @@ class DlgConfig extends Dialog {
       $this->projeto->larguraMapa = $this->spbLarguraMapa->get_value_as_int();
       $this->projeto->alturaMapa = $this->spbAlturaMapa->get_value_as_int();
       $this->projeto->quantidadeLayers = $this->spbQtdLayers->get_value_as_int();
-      $this->projeto->corDeFundo = GtkColorSelection::palette_to_string(
-                                     array($this->cbCorDeFundo->get_color()));
+// -- Downgrade de código para compatibilidade com o gerador de executário
+      $this->projeto->corDeFundo
+        = GtkColorSelection::palette_to_string($this->cbCorDeFundo->get_color(), 1);
+//      $this->projeto->corDeFundo = GtkColorSelection::palette_to_string(
+//                                     array($this->cbCorDeFundo->get_color()));
+// -- Fim do downgrade
       $this->projeto->linguagemExport = $this->cbLinguagemExport->get_active_text();
       $this->projeto->pathTileset = $this->fcbCarrTileset->get_filename();
     }

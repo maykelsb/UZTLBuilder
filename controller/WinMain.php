@@ -101,8 +101,9 @@ final class WinMain extends Window {
   public function exibirFormExportar() {
     // -- Copiar conteúdo para a layer em memória
     $this->atualizarLayers();
-    $this->projeto->dumpLayersComoImagem();
-    $dlg = new DlgExport($this->projeto->pathDump);
+    $this->projeto->dumpLayers();
+    $dlg = new DlgExport(array('image' => $this->projeto->pathDump,
+                               'source' => $this->projeto->pathSource));
     $dlg->run();
     $dlg->destroy();
   }

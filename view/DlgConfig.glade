@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.3 on Sat Dec 26 20:35:21 2009 -->
+<!--Generated with glade3 3.4.3 on Sun May 02 21:41:19 2010 -->
 <glade-interface>
   <widget class="GtkDialog" id="DlgConfig">
     <property name="border_width">5</property>
@@ -138,6 +138,7 @@
                 <property name="width_request">109</property>
                 <property name="height_request">23</property>
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="editable">False</property>
                 <property name="adjustment">1 1 4 1 10 10</property>

@@ -46,13 +46,17 @@
 class DlgExport extends Dialog {
   private $mockupPath;
 
-  public function __construct($pathDump) {
+  public function __construct($arrDumps) {
     parent::__construct();
     // -- Exibição do mockup da fase criada.
-    $this->mockupPath = $pathDump;
-    $this->imgMockup->set_from_file($pathDump);
+    $this->mockupPath = $arrDumps['image'];
+    $this->sourcePath = $arrDumps['source'];
+    $this->imgMockup->set_from_file($arrDumps['image']);
   }
 
+  /**
+  * Salva o arquivo png com o conteúdo da fase construída.
+  */
   public function indicaDestinoImagem() {
     $pathDestino = $this->dlgArquivos('Salvar imagem',
                                       Gtk::FILE_CHOOSER_ACTION_SAVE,
@@ -62,7 +66,27 @@ class DlgExport extends Dialog {
 
     if (!is_null($pathDestino)) {
       if (!copy($this->mockupPath, $pathDestino)) {
-        trigger_error('Não foi possível copiar o arquivo para o caminho solicitado.');
+        trigger_error('Não foi possível criar o arquivo destino.');
+      }
+    }
+  }
+
+  /**
+  * Salva um arquivo txt com o conteúdo da fase construída no formato utilizado pelo javame.
+  *
+  * Formato JME: tiles vazios recebem o valor '0', e a contagem dos tiles no
+  * tileset iniciam em '1'. É possível criar animações de tiles no javame, no
+  * entanto, este recurso ainda não é suportado pela aplicação.
+  */
+  public function indicaDestinoSource() {
+    $pathDestino = $this->dlgArquivos('Salvar source',
+                                      Gtk::FILE_CHOOSER_ACTION_SAVE,
+                                      array('desc' => 'Source TXT',
+                                            'ext' => '*.txt'));
+    if (!strpos($pathDestino, '.txt')) { $pathDestino .= '.txt'; }
+    if (!is_null($pathDestino)) {
+      if (!copy($this->sourcePath, $pathDestino)) {
+        trigger_error('Não foi possível criar o arquivo destino.');
       }
     }
   }

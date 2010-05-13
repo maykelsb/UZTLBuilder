@@ -106,7 +106,17 @@ final class Projeto {
   */
   private $layers = array();
 
+  /**
+  * Caminho do último dump gerado no formato de imagem.
+  * @var string
+  */
   private $pathDump;
+
+  /**
+  * Caminho do último dump gerado no formato de utilização no código fonte.
+  * @var string
+  */
+  private $pathSource;
 
   /**
   * Propriedades de configuração do projeto.
@@ -374,7 +384,7 @@ final class Projeto {
     $this->layers = array_values($this->layers);
   }
 
-  public function dumpLayersComoImagem() {
+  public function dumpLayers() {
     // -- Verifica se existe o diretório de dumps
     $pathDump = $this->pathProjeto . DIRECTORY_SEPARATOR . self::PATH_DUMPS . DIRECTORY_SEPARATOR;
     if (!is_dir($pathDump)) {
@@ -382,7 +392,42 @@ final class Projeto {
         trigger_error('Não foi possível criar a pasta de DUMPS.');
       }
     }
+    $this->dumpLayersComoImagem($pathDump);
+    $this->dumpLayersComoSource($pathDump);
+  }
 
+  private function qtdTilesPorLinha() {
+    list($width, $height) = getimagesize($this->pathTileset);
+    return ($width / $this->larguraTile);
+  }
+
+  /**
+  * Faz um dump das layers como um array para utilização em códigos fontes.
+  *
+  * @param string $pathDump Diretório de destino dos dumps;
+  */
+  private function dumpLayersComoSource($pathDump) {
+    $arrLayer = array();
+    $qtdTilesLinha = $this->qtdTilesPorLinha();
+    foreach ($this->layers[0] as $iKeyLinha => $linhaLayer) {
+      $arrLinha = array();
+      foreach ($linhaLayer as $iKeyColuna => $tile) {
+        if (is_null($tile)) { $arrLinha[] = 0;
+        } else {
+          list($linha, $coluna) = explode('-', $tile);
+          $arrLinha[] = (($linha * $qtdTilesLinha) + $coluna + 1);
+        } // -- Converter para valores JME
+      }
+      $arrLayer[] = '{' . implode(', ', $arrLinha) . '}';
+    }
+    // -- Salvando o array na pasta de dumps
+    $pathDump = $pathDump . count(glob("{$pathDump}*.txt")) . '.txt';
+    file_put_contents($pathDump, '{' . implode((', ' . PHP_EOL . ' '), $arrLayer) . '}');
+    unset($arrLayer);
+    $this->pathSource = $pathDump;
+  }
+
+  private function dumpLayersComoImagem($pathDump) {
     $dump = imagecreatetruecolor(($this->larguraMapa * $this->larguraTile),
                                  ($this->alturaMapa * $this->alturaTile));
     // -- Transparência para a imagem de fundo
